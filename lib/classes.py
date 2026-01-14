@@ -66,7 +66,7 @@ class F1DB:
     def update(self):
         os.chdir(self.root_dir)
         subprocess.run(
-            [os.path.join(self.root_dir, "install")], check=True
+            [os.path.join(self.root_dir, "init")], check=True
         )
 
     def execute(self, sql: str, params: Optional[Iterable] ) -> list[Any]:
@@ -640,11 +640,11 @@ class Circuit:
         print(f"* {name} ({full_name})")
         print(f"At: {country_id} - {place}")
         print(f"Lenght: {length}km, turns: {turns}")
-        print(f"Total races held: {total_races}")
+        print(f"Total races: {total_races}")
         years = races_years.split(',')
 
         for i in range(0, len(years), years_per_row):
-            print('\t' + ','.join(years[i:i+years_per_row]))
+            print('\t' + ', '.join(years[i:i+years_per_row]))
 
         if prev_names:
             print(f"Previous names: \n\t{prev_names}")

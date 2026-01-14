@@ -14,7 +14,7 @@ You can fetch plenty of different tables and statistics:
 
 ```sh
 # The season tables
-python f1_stats.py --gp-flags season 2023 >> README.md
+python f1.py --gp-flags season 2023 >> README.md
 ```
 
 | pos | name             | 🇧🇭 BHR | 🇸🇦 SAU | 🇦🇺 AUS | 🇦🇿 AZE | 🇺🇸 MIA | 🇲🇨 MCO | 🇪🇸 ESP | 🇨🇦 CAN | 🇦🇹 AUT | 🇬🇧 GBR | 🇭🇺 HUN | 🇧🇪 BEL | 🇳🇱 NLD | 🇮🇹 ITA | 🇸🇬 SGP | 🇯🇵 JPN | 🇶🇦 QAT | 🇺🇸 USA | 🇲🇽 MEX | 🇧🇷 SAO | 🇺🇸 LAS | 🇦🇪 ABD | pts |
@@ -44,7 +44,7 @@ python f1_stats.py --gp-flags season 2023 >> README.md
 
 ```sh
 # Season overview (different statistics)
-python f1_stats.py driver fernando-alonso 2012 -o
+python f1.py driver fernando-alonso 2012 -o
 ```
 
 ```
@@ -105,7 +105,7 @@ Race progress
 
 ```sh
 # Circuit records
-python f1_stats.py circuit monza --best-lap --rows=5
+python f1.py circuit monza --best-lap --rows=5
 ```
 
 ```
@@ -120,7 +120,7 @@ python f1_stats.py circuit monza --best-lap --rows=5
 
 ```sh
 # You can also chain flags
-python f1_stats.py driver max-verstappen 2025 --pit-stops --sprints
+python f1.py driver max-verstappen 2025 --pit-stops --sprints
 ```
 ```
 |                | pit 1           | pit 2           | pit 3           | pit 4           | pit 5           |   |
@@ -171,8 +171,8 @@ cd f1-stats
 ## Misc
 
 ```
-python f1_stats.py --help
-usage: f1_stats.py [-h] [--double-headers] [--no-delimiters] [--adjustment {left,center,right}] [--gp-flags] {circuit,driver,season,search,db} ...
+python f1.py --help
+usage: f1.py [-h] [--double-headers] [--no-delimiters] [--adjustment {left,center,right}] [--gp-flags] {circuit,driver,season,search,db} ...
 
 Diferrent charts, statistics, records, all time bests of Formula One
 
@@ -194,8 +194,8 @@ options:
   --gp-flags            Add emoji flags to grand prix
 
 # You can also use --help for each subcommand: 
-python f1_stats.py driver --help
-usage: f1_stats.py driver [-h] [-r] [-s] [-q] [-p] [-o] ID YEAR
+python f1.py driver --help
+usage: f1.py driver [-h] [-r] [-s] [-q] [-p] [-o] ID YEAR
 
 positional arguments:
   ID                Driver id

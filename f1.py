@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import os, argparse
+import os, argparse, sys
 
 from lib.tables import Table
 from lib.classes import (
@@ -23,11 +23,13 @@ def main(args: argparse.Namespace):
         root_dir=os.path.dirname(os.path.realpath(__file__))
     ) 
 
+    argc = len(sys.argv)
+
     match args.command:
         case "circuit":
             circuit = Circuit(args.id, args.rows, args.reverse, f1db, table)
 
-            if args.info:
+            if args.info or argc == 3:
                 circuit.info()
 
             if args.best_lap:
