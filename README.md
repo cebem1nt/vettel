@@ -307,7 +307,7 @@ python f1.py driver max-verstappen 2025 --pit-stops --sprints
 ```sh
 git clone https://github.com/cebem1nt/f1-stats.git
 cd f1-stats
-./install # Set up the db
+./init # Set up the db
 ```
 
 ## Misc
