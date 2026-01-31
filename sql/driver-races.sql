@@ -34,5 +34,4 @@ LEFT JOIN
     and race_driver_standing.driver_id = :id    
 WHERE 
     rd.driver_id = :id and 
-    rd.type = 'RACE_RESULT' and 
-    race.year = :year
+    rd.type = 'RACE_RESULT'

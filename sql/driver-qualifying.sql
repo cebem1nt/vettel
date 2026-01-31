@@ -16,5 +16,4 @@ JOIN
     grand_prix on grand_prix.id = race.grand_prix_id
 WHERE    
     q.type = 'QUALIFYING_RESULT' and
-    q.driver_id = :id and
-    race.year = :year
+    q.driver_id = :id

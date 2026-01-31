@@ -12,22 +12,30 @@ from lib.emoji import gp_flags
 
 class Streak:
     def __init__(self, condition: Callable[[int], bool]):
-        self.longest = 0
-        self.current = 0
+        self.longest = []
+        self.current = []
         self._is_continued = condition
 
-    def update(self, value: int):
+    def update(self, value: int, description: Optional[Any] = None):
         if self._is_continued(value):
-            self.current += 1
+            self.current.append(description)
             return
 
-        if self.current > self.longest:
+        if len(self.current) > len(self.longest):
             self.longest = self.current
         
-        self.current = 0
+        self.current = []
+
+    def __str__(self):
+        longest = self.get()
+
+        if len(longest) == 0:
+            return ''
     
-    def get(self) -> int:
-        return max(self.longest, self.current)
+        return f"{longest[0]} ... {longest[-1]}"
+
+    def get(self):
+        return max(self.longest, self.current, key=len)
 
 class F1DB:
     def __init__(self, root_dir: str):
@@ -38,13 +46,18 @@ class F1DB:
         self.root_dir = root_dir
 
     def run_script(
-        self, name: str, 
-        params: Optional[Iterable]
+        self, 
+        name: str, 
+        params: Optional[Iterable] = None,
+        extra_sql: Optional[str] = None
     ) -> list[Any]:
         script = os.path.join(self.sql_scripts_dir, name + ".sql")
         
         with open(script) as s:
             sql = s.read()
+
+        if extra_sql:
+            sql += extra_sql
 
         if params:
             self.cur.execute(sql, params)
@@ -85,9 +98,15 @@ class Base:
         self.db = db_handler
         self.table = out_table
 
-    def flush_script(self, script: str) -> bool:
+    def flush_script(
+        self, 
+        script: str, 
+        params: Iterable[Any], 
+        extra_sql: Optional[str] = None
+    ) -> bool:
+
         rows = self.db.run_script(
-            script, {"id": self.id, "year": self.year}
+            script, params, extra_sql
         )
 
         if not rows:
@@ -197,9 +216,17 @@ class Driver(Base):
         self.year = year
 
     def races(self):
-        rows = self.db.run_script(
-            "driver-races", { "id": self.id, "year": self.year }
-        )
+        if not self.year:
+            rows = self.db.run_script(
+                "driver-races", 
+                params={"id": self.id}
+            )
+        else:
+            rows = self.db.run_script(
+                "driver-races",
+                extra_sql="and race.year = :year",
+                params={"id": self.id, "year": self.year} 
+            )
 
         self.table.headers = self.db.get_columns(6)
         comments = []
@@ -237,9 +264,17 @@ class Driver(Base):
         print_comments(comments)
 
     def pits(self):
-        rows = self.db.run_script(
-            "driver-pits", {"id": self.id, "year": self.year}
-        )
+        if not self.year:
+            rows = self.db.run_script(
+                "driver-pits", 
+                params={"id": self.id}
+            )
+        else:
+            rows = self.db.run_script(
+                "driver-pits",
+                extra_sql="and race.year = :year",
+                params={"id": self.id, "year": self.year} 
+            )
 
         races_pits = defaultdict(list)
         most_pits = -1
@@ -277,15 +312,29 @@ class Driver(Base):
         self.table.flush()
 
     def qualifying(self):
-        self.flush_script("driver-qualifying")
+        if self.year:
+            self.flush_script("driver-qualifying", {"id": self.id, "year": self.year}, extra_sql="and race.year = :year")
+        else:
+            self.flush_script("driver-qualifying", {"id": self.id} )
 
     def sprints(self):
-        self.flush_script("driver-sprints")
+        if self.year:
+            self.flush_script("driver-sprints", {"id": self.id, "year": self.year}, extra_sql="and race.year = :year")
+        else:
+            self.flush_script("driver-sprints", {"id": self.id} )
 
     def overview(self):
-        rows = self.db.run_script(
-           "driver-season-overview", {"id": self.id, "year": self.year}
-        )
+        if not self.year:
+            rows = self.db.run_script(
+                "driver-season-overview", 
+                params={"id": self.id}
+            )
+        else:
+            rows = self.db.run_script(
+                "driver-season-overview",
+                extra_sql="and r.year = :year",
+                params={"id": self.id, "year": self.year} 
+            )
     
         if not rows:
             return print(f"No data found for {self.id} - {self.year}")
@@ -297,6 +346,7 @@ class Driver(Base):
         gained_positions = []
         race_pit_stops = []
         season_pts_pos = None
+        team_prev_pts = 0
 
         total = {
             "gains": 0,
@@ -326,14 +376,15 @@ class Driver(Base):
         longest_pod_streak = Streak(lambda x: x and x <= 3)
         longest_pts_streak = Streak(lambda x: x and x <= 10)
 
-        for gp, is_fastest, is_pole, q3, pits, start, finish, finish_text, reason_retired, gained,\
-            gap, laps, penalty, pts_after_race, pts_made, pts_pos_after, team_pts_after_race in rows:
+        for year, gp, is_fastest, is_pole, q3, pits, start, finish, finish_text, reason_retired, gained,\
+            gap, laps, penalty, pts_made, pts_pos_after, sprint_points, team_pts_after_race in rows:
 
-            longest_win_streak.update(finish)
-            longest_pod_streak.update(finish)
-            longest_pts_streak.update(finish)
+            longest_win_streak.update(finish, (year, gp))
+            longest_pod_streak.update(finish, (year, gp))
+            longest_pts_streak.update(finish, (year, gp))
 
             pts_made = ifnone(pts_made, 0)
+            sprint_points = ifnone(sprint_points, 0)
             team_pts_after_race = ifnone(team_pts_after_race, 0)
 
             if not start and finish: # PL start case
@@ -370,16 +421,21 @@ class Driver(Base):
                 nfs[finish_text][1].append(gp)
                 nfs[finish_text][2].append(reason_retired)
 
-            team_pts_made = team_pts_after_race - total["team_pts"]
+            if team_prev_pts > team_pts_after_race:
+                team_pts_made = team_pts_after_race
+            else:
+                team_pts_made = team_pts_after_race - team_prev_pts
 
             total["races"] += 1
             total["poles"] += ifnone(is_pole, 0)
             total["fastest_laps"] += ifnone(is_fastest, 0)
-            total["pts"] = pts_after_race
-            total["team_pts"] = team_pts_after_race
+            total["pts"] += pts_made + sprint_points
+            total["team_pts"] += team_pts_made
             season_pts_pos = pts_pos_after
             per_race_pts_made.append(pts_made)
             per_race_team_pts_made.append(team_pts_made)
+            
+            team_prev_pts = team_pts_after_race
 
         pole_conversion = total["poles"] / total["q3"] if total["q3"] else 0
         finish_rate = total["finished"] / total["races"]
@@ -427,10 +483,13 @@ class Driver(Base):
             WHERE 
                 pit.type = 'PIT_STOP' 
                 and pit.driver_id = :id 
-                and race.year = :year
         """
 
-        rows = self.db.execute(sql, {"id": self.id, "year": self.year})
+        if self.year:
+            sql += "and race.year = :year"
+            rows = self.db.execute(sql, {"id": self.id, "year": self.year})
+        else:
+            rows = self.db.execute(sql, {"id": self.id })
 
         pit_times = []
         problematic_pits = 0
@@ -452,9 +511,9 @@ class Driver(Base):
             problematic_thresh = median(pit_times) + 3.0 * iqr
 
             problematic_pits = sum(1 for t in pit_times if t > problematic_thresh)
-            avg_pit_time = mean(pit_times)
+            avg_pit_time = mean([t for t in pit_times if t < problematic_thresh])
 
-        print(f"\nSeason overview — {self.id}, {self.year}")
+        print(f"\nSeason overview — {self.id} ({self.year if self.year else "All time"})")
         print("-" * 50)
         print(f"Races: {total["races"]}  Finished: {total["finished"]}  Not finished/started: {not_finished}  (rate: {not_finished_rate:.1%})\n")
 
@@ -503,12 +562,20 @@ class Driver(Base):
 
         print("Race progress")
         print(f"- Avg positions gained per race: {avg_gained_positions:.2f}")
-        print(f"- % races net gain: {pct_gain:.1%}")
-        print(f"- % races net loss: {pct_loss:.1%}")
-        print(f"- % races no change: {pct_no_change:.1%}")
-        print(f"- Longest podium streak: {longest_pod_streak.get()}")
-        print(f"- Longest win streak: {longest_win_streak.get()}")
-        print(f"- Longest points streak: {longest_pts_streak.get()}\n")
+        print(f"- Races net gain: {pct_gain:.1%}")
+        print(f"- Races net loss: {pct_loss:.1%}")
+        print(f"- Races no change: {pct_no_change:.1%}")
+
+        pod_streak = len(longest_pod_streak.get())
+        win_streak = len(longest_win_streak.get())
+        pts_streak = len(longest_pts_streak.get())
+
+        print(f"- Longest podium streak: {pod_streak}" + 
+              (f"\n  * {longest_pod_streak}" if pod_streak else ''))
+        print(f"- Longest win streak: {win_streak}" +
+              (f"\n  * {longest_win_streak}" if win_streak else ''))
+        print(f"- Longest points streak: {pts_streak}" +
+              (f"\n  * {longest_pts_streak}" if pts_streak else ''))
 
 class Season:
     def __init__(

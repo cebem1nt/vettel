@@ -1,4 +1,5 @@
 SELECT
+    r.year,
     r.grand_prix_id,
     rd.race_fastest_lap,
     rd.race_pole_position,
@@ -12,9 +13,9 @@ SELECT
     rd.race_gap_millis,
     rd.race_laps,
     rd.race_time_penalty,
-    rds.points,
     rd.race_points,
     rds.position_number,
+    srr.points,
     rcs.points
 FROM 
     race_data rd
@@ -34,7 +35,9 @@ LEFT JOIN
 LEFT JOIN
     race_constructor_standing rcs on rcs.race_id = r.id and
     rcs.constructor_id = rd.constructor_id
+LEFT JOIN
+    sprint_race_result srr on srr.race_id = r.id and 
+    srr.driver_id = :id
 WHERE 
     rd.driver_id = :id and 
-    rd.type = 'RACE_RESULT' and 
-    r.year = :year
+    rd.type = 'RACE_RESULT'

@@ -3,7 +3,6 @@ import os, argparse, sys
 
 from lib.tables import Table
 from lib.classes import (
-    Streak, 
     F1DB, 
     GP,
     DB,
@@ -129,9 +128,9 @@ if __name__ == "__main__":
     circuit_p.add_argument      ("-R",  "--reverse",         action="store_true", help="Reverse results")
     circuit_p.add_argument      ("-r",  "--rows", type=int,  default=15,          help="Amount of rows to fetch, -1 means all. Defaults to 15")
 
-    driver_p = subps.add_parser("driver", help="Different driver's statistics, data over the season")
+    driver_p = subps.add_parser("driver", help="Different driver's statistics, data over the season or all time")
     driver_p.add_argument      ("id",   metavar="ID",   type=str,            help="Driver id")
-    driver_p.add_argument      ("year", metavar="YEAR", type=str,            help="Season year")
+    driver_p.add_argument      ("year", metavar="YEAR", type=str, nargs="?", help="Optional season year, if not provided, all time")
     driver_p.add_argument      ("-r", "--races",        action="store_true", help="Table of driver season races")
     driver_p.add_argument      ("-s", "--sprints",      action="store_true", help="Table of driver season sprints")
     driver_p.add_argument      ("-q", "--qualifying",   action="store_true", help="Table of driver race qualifyings")
@@ -165,7 +164,7 @@ if __name__ == "__main__":
 
     args = p.parse_args()
 
-    if any(vars(args).values()):
+    if any(vars(args).values()) and args.command:
         main(args)
     else:
         p.print_help()

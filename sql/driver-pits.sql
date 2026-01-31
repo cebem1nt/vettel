@@ -10,5 +10,4 @@ JOIN
     grand_prix on grand_prix.id = race.grand_prix_id
 WHERE
     pit.type = 'PIT_STOP' and
-    pit.driver_id = :id and
-    race.year = :year
+    pit.driver_id = :id

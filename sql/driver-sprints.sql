@@ -25,5 +25,4 @@ LEFT JOIN
     r.type = 'SPRINT_RACE_RESULT'
 WHERE    
     q.type = 'SPRINT_QUALIFYING_RESULT' and
-    q.driver_id = :id and
-    race.year = :year
+    q.driver_id = :id

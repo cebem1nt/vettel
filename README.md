@@ -14,7 +14,7 @@ You can fetch plenty of different tables and statistics:
 
 ```sh
 # The season tables
-python f1.py --gp-flags season 2023 >> README.md
+python f1.py season 2023 --flags >> README.md
 ```
 
 | pos | name             | 🇧🇭 BHR | 🇸🇦 SAU | 🇦🇺 AUS | 🇦🇿 AZE | 🇺🇸 MIA | 🇲🇨 MCO | 🇪🇸 ESP | 🇨🇦 CAN | 🇦🇹 AUT | 🇬🇧 GBR | 🇭🇺 HUN | 🇧🇪 BEL | 🇳🇱 NLD | 🇮🇹 ITA | 🇸🇬 SGP | 🇯🇵 JPN | 🇶🇦 QAT | 🇺🇸 USA | 🇲🇽 MEX | 🇧🇷 SAO | 🇺🇸 LAS | 🇦🇪 ABD | pts |
@@ -48,7 +48,7 @@ python f1.py driver fernando-alonso 2012 -o
 ```
 
 ```
-Season overview — fernando-alonso, 2012
+Season overview — fernando-alonso (2012)
 --------------------------------------------------
 Races: 20  Finished: 18  Not finished/started: 2  (rate: 10.0%)
 
@@ -95,12 +95,154 @@ Not started/finished/classified, disqualified:
 
 Race progress
 - Avg positions gained per race: 3.47
-- % races net gain: 72.2%
-- % races net loss: 11.1%
-- % races no change: 16.7%
+- Races net gain: 72.2%
+- Races net loss: 11.1%
+- Races no change: 16.7%
 - Longest podium streak: 5
+  * (2012, 'korea') ... (2012, 'brazil')
 - Longest win streak: 1
+  * (2012, 'malaysia') ... (2012, 'malaysia')
 - Longest points streak: 11
+  * (2012, 'australia') ... (2012, 'hungary')
+```
+
+```sh
+# All time overview
+python f1.py driver fernando-alonso 2012 -o
+```
+
+```
+ python f1.py driver fernando-alonso -o
+
+Season overview — fernando-alonso (All time)
+--------------------------------------------------
+Races: 428  Finished: 353  Not finished/started: 75  (rate: 17.5%)
+
+Points
+- Total pts: 2393 pts (10 place)
+- Team pts share: 70.44%
+- Pts per race: 5.59 pts
+- Avg pts when scoring: 8.52 pts
+- Points volatility (std): 6.20 pts
+
+Qualifying & starts
+- Poles: 22  (Pole rate: 5.1%)
+- Q1, Q2 eliminations: 187 (rate: 43.7%)
+- Q3 appearances: 241
+- Pole conversion (poles / Q3s): 9.1%
+- Avg grid position: 8.68
+- Median grid position: 8.00
+- Most common grid position: 2
+- Penalties: 7
+
+Results & rates
+- Wins: 32  (Win rate: 7.5%)
+- Podiums: 106  (Podium rate: 24.8%)
+- Scoring finishes: 281  (Scoring rate: 65.7%)
+- Fastest laps: 26  (Fastest-lap rate: 6.1%)
+- Finish rate: 82.5%
+- Avg finish position: 6.67
+- Median finish position: 6.00
+- Most common finish position: 2
+- Finish position CV (coefficient of variation): 0.660
+
+Pit stops & strategy
+- Avg pit stops per race: 2.00
+- Avg pit stops time: 24.65s
+- Problematic pit stops: 34
+
+Not started/finished/classified, disqualified:
+- DNF: 73 (17.1%)
+  * brazil - Electrical
+  * san-marino - Brakes
+  * austria - Gearbox
+  * monaco - Gearbox
+  * canada - Transmission
+  * hungary - Brakes
+  * belgium - Gearbox
+  * united-states - Driveshaft
+  * austria - Engine
+  * france - Engine
+  * great-britain - Gearbox
+  * united-states - Engine
+  * japan - Engine
+  * monaco - Accident
+  * canada - Driveshaft
+  * united-states - Puncture
+  * belgium - Engine
+  * italy - Spun off
+  * canada - Suspension
+  * hungary - Wheel nut
+  * italy - Engine
+  * japan - Accident
+  * spain - Engine
+  * canada - Spun off
+  * europe - Collision damage
+  * hungary - Wheel
+  * belgium - Wheel
+  * brazil - Collision
+  * belgium - Accident
+  * canada - Collision
+  * belgium - Collision
+  * japan - Collision
+  * malaysia - Collision damage
+  * italy - Engine
+  * japan - Electrical
+  * malaysia - Power unit
+  * spain - Brakes
+  * monaco - Gearbox
+  * canada - Exhaust
+  * austria - Collision
+  * singapore - Gearbox
+  * mexico - Power unit
+  * australia - Collision
+  * spain - Power unit
+  * europe - Gearbox
+  * australia - Broken floor
+  * china - Driveshaft
+  * austria - Collision damage
+  * great-britain - Fuel pump
+  * belgium - Power unit
+  * singapore - Collision damage
+  * united-states - Engine
+  * monaco - Gearbox
+  * canada - Exhaust
+  * belgium - Collision
+  * italy - Electrical
+  * united-states - Collision
+  * mexico - Water pressure
+  * bahrain - Brakes
+  * united-states - Rear wing
+  * saudi-arabia - Water pressure
+  * emilia-romagna - Collision damage
+  * italy - Water pressure
+  * singapore - Engine
+  * abu-dhabi - Water leak
+  * united-states - Undertray
+  * mexico - Collision damage
+  * mexico - Brakes
+  * australia - Accident
+  * china - Brakes
+  * monaco - Engine
+  * italy - Suspension
+  * mexico - Brakes
+- DNS: 2 (0.5%)
+  * united-states - Withdrew
+  * russia - Gearbox
+- DSQ: 0 (0.0%)
+- NC: 0 (0.0%)
+
+Race progress
+- Avg positions gained per race: 1.92
+- Races net gain: 60.3%
+- Races net loss: 24.4%
+- Races no change: 15.3%
+- Longest podium streak: 15
+  * (2005, 'turkey') ... (2006, 'canada')
+- Longest win streak: 4
+  * (2006, 'spain') ... (2006, 'canada')
+- Longest points streak: 23
+  * (2011, 'europe') ... (2012, 'hungary')
 ```
 
 ```sh
@@ -171,18 +313,18 @@ cd f1-stats
 ## Misc
 
 ```
-python f1.py --help
-usage: f1.py [-h] [--double-headers] [--no-delimiters] [--adjustment {left,center,right}] [--gp-flags] {circuit,driver,season,search,db} ...
+python f1.py --help #You can also use --help for each subcommand:
+usage: f1 [-h] [--double-headers] [--no-delimiters] [--adjustment {left,center,right}] {circuit,driver,gp,season,db} ...
 
 Diferrent charts, statistics, records, all time bests of Formula One
 
 positional arguments:
-  {circuit,driver,season,search,db}
+  {circuit,driver,gp,season,db}
                         Available commands
     circuit             Get different records for a circuit
-    driver              Different driver's statistics, data over the season
+    driver              Different driver's statistics, data over the season or all time
+    gp                  Grand prix results tables
     season              Fancy wikipedia like season table for driver/constructor championship
-    search              Search for different rows in tables by name
     db                  Different database related commands
 
 options:
@@ -191,21 +333,4 @@ options:
   --no-delimiters       Do not print any separators for tables
   --adjustment {left,center,right}
                         Table text alignment
-  --gp-flags            Add emoji flags to grand prix
-
-# You can also use --help for each subcommand: 
-python f1.py driver --help
-usage: f1.py driver [-h] [-r] [-s] [-q] [-p] [-o] ID YEAR
-
-positional arguments:
-  ID                Driver id
-  YEAR              Season year
-
-options:
-  -h, --help        show this help message and exit
-  -r, --races       Get a table of driver season races
-  -s, --sprints     Get a table of driver season sprints
-  -q, --qualifying  Get a table of driver qualifyings
-  -p, --pit-stops   Get a table of pit stops for each race
-  -o, --overview    An overview, driver statistics for a season
 ```
