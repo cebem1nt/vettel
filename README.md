@@ -108,7 +108,7 @@ Race progress
 
 ```sh
 # All time overview
-python f1.py driver fernando-alonso 2012 -o
+python f1.py driver fernando-alonso -o
 ```
 
 ```
