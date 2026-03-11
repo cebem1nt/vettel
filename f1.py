@@ -8,7 +8,8 @@ from lib.classes import (
     DB,
     Driver, 
     Season,
-    Circuit
+    Circuit,
+    Calendar
 )
 
 def main(args: argparse.Namespace):
@@ -64,6 +65,10 @@ def main(args: argparse.Namespace):
 
             if args.sprints:
                 driver.sprints()
+
+        case "calendar":
+            calendar = Calendar(args.year, f1db)
+            calendar.calendar()
 
         case "gp":
             gp = GP(args.id, args.year, f1db, table)
@@ -150,6 +155,8 @@ if __name__ == "__main__":
     champ_p.add_argument      ("-c", "--constructor", action="store_true", help="Show constructor standing instead of driver")
     champ_p.add_argument      ("--flags", action="store_true", help="Add emoji flags to grand prix columns")
 
+    calendar_p = subps.add_parser("calendar", help="Dates/calendar for a given season")
+    calendar_p.add_argument      ("year", metavar="YEAR", type=str, help="Season year")
 
     db_p = subps.add_parser("db",  help="Different database related commands")
     db_p.add_argument      ("-s",  "--sql",          type=str,              help="Run arbitrary sql on the f1db")

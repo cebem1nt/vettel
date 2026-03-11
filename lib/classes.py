@@ -1,5 +1,6 @@
 import sqlite3, os, subprocess
 
+from datetime import datetime
 from typing import Callable, Iterable, Optional, Tuple, Any
 from statistics import mean, stdev, median, median_low, median_high, mode
 
@@ -768,3 +769,32 @@ class DB:
 
             for i in range(len(headers)):
                 print(f"{headers[i]}: {found[i]}")
+
+class Calendar:
+    def __init__(
+        self,
+        year: int,
+        db_handler: F1DB
+    ):
+        self.year = year
+        self.db = db_handler
+
+    def calendar(self):
+        fetched = self.db.run_script("calendar", [self.year])
+
+        for rnd, gp, date, sprint_date, qualifying_date, sprint_qualifying_date in fetched:
+            date            = datetime.strptime(date, "%Y-%m-%d").strftime('%B %d, %Y')
+            qualifying_date = datetime.strptime(qualifying_date, "%Y-%m-%d").strftime('%B %d, %Y')
+
+            print(f"Round {rnd} - {gp}")
+            print(f"  * Race: {date}")
+            print(f"  * Race qualifying: {qualifying_date}")
+
+            if sprint_date:
+                sprint_date            = datetime.strptime(sprint_date, "%Y-%m-%d").strftime('%B %d, %Y')
+                sprint_qualifying_date = datetime.strptime(sprint_qualifying_date, "%Y-%m-%d").strftime('%B %d, %Y')
+
+                print(f"  * Sprint: {sprint_date}")
+                print(f"  * Sprint qualifying: {sprint_qualifying_date}")
+
+            print()
