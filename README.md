@@ -313,18 +313,18 @@ cd f1-stats
 ## Misc
 
 ```
-python f1.py --help #You can also use --help for each subcommand:
-usage: f1 [-h] [--double-headers] [--no-delimiters] [--adjustment {left,center,right}] {circuit,driver,gp,season,db} ...
+usage: f1.py [-h] [--double-headers] [--no-delimiters] [--adjustment {left,center,right}] {circuit,driver,gp,season,calendar,db} ...
 
 Diferrent charts, statistics, records, all time bests of Formula One
 
 positional arguments:
-  {circuit,driver,gp,season,db}
+  {circuit,driver,gp,season,calendar,db}
                         Available commands
     circuit             Get different records for a circuit
     driver              Different driver's statistics, data over the season or all time
     gp                  Grand prix results tables
     season              Fancy wikipedia like season table for driver/constructor championship
+    calendar            Dates/calendar for a given season
     db                  Different database related commands
 
 options:
