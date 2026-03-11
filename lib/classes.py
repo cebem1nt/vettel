@@ -1,42 +1,15 @@
 import sqlite3, os, subprocess
 
 from datetime import datetime
-from typing import Callable, Iterable, Optional, Tuple, Any
+from typing import Iterable, Optional, Tuple, Any
 from statistics import mean, stdev, median, median_low, median_high, mode
 
 from collections import defaultdict
 from itertools import islice
 
-from lib.helpers import strsign, annotate_pf, ifnone, separator, print_comments
+from lib.helpers import strsign, annotate_pf, ifnone, separator, print_comments, Streak
 from lib.tables import Table
 from lib.emoji import gp_flags
-
-class Streak:
-    def __init__(self, condition: Callable[[int], bool]):
-        self.longest = []
-        self.current = []
-        self._is_continued = condition
-
-    def update(self, value: int, description: Optional[Any] = None):
-        if self._is_continued(value):
-            self.current.append(description)
-            return
-
-        if len(self.current) > len(self.longest):
-            self.longest = self.current
-        
-        self.current = []
-
-    def __str__(self):
-        longest = self.get()
-
-        if len(longest) == 0:
-            return ''
-    
-        return f"{longest[0]} ... {longest[-1]}"
-
-    def get(self):
-        return max(self.longest, self.current, key=len)
 
 class F1DB:
     def __init__(self, root_dir: str):

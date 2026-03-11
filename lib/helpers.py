@@ -1,7 +1,34 @@
-from typing import Any
+from typing import Any, Callable, Optional
 
 SUP_F = "\u1DA0"
 SUP_P = "\u1D56"
+
+class Streak:
+    def __init__(self, condition: Callable[[int], bool]):
+        self.longest = []
+        self.current = []
+        self._is_continued = condition
+
+    def update(self, value: int, description: Optional[Any] = None):
+        if self._is_continued(value):
+            self.current.append(description)
+            return
+
+        if len(self.current) > len(self.longest):
+            self.longest = self.current
+        
+        self.current = []
+
+    def __str__(self):
+        longest = self.get()
+
+        if len(longest) == 0:
+            return ''
+    
+        return f"{longest[0]} ... {longest[-1]}"
+
+    def get(self):
+        return max(self.longest, self.current, key=len)
 
 def strsign(value: int):
     sign = '+' if value > 0 else ''
