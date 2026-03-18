@@ -313,16 +313,17 @@ cd f1-stats
 ## Misc
 
 ```
-usage: f1.py [-h] [--double-headers] [--no-delimiters] [--adjustment {left,center,right}] {circuit,driver,gp,season,calendar,db} ...
+usage: f1.py [-h] [--double-headers] [--no-delimiters] [--adjustment {left,center,right}] {circuit,driver,race,sprint,season,calendar,db} ...
 
 Diferrent charts, statistics, records, all time bests of Formula One
 
 positional arguments:
-  {circuit,driver,gp,season,calendar,db}
+  {circuit,driver,race,sprint,season,calendar,db}
                         Available commands
     circuit             Get different records for a circuit
     driver              Different driver's statistics, data over the season or all time
-    gp                  Grand prix results tables
+    race                Race result table
+    sprint              Sprint result table
     season              Fancy wikipedia like season table for driver/constructor championship
     calendar            Dates/calendar for a given season
     db                  Different database related commands
