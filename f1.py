@@ -4,8 +4,9 @@ import os, argparse, sys
 from lib.tables import Table
 from lib.classes import (
     F1DB, 
-    GP,
     DB,
+    Race,
+    Sprint,
     Driver, 
     Season,
     Circuit,
@@ -51,14 +52,14 @@ def main(args: argparse.Namespace):
         case "driver":
             driver = Driver(args.id, args.year, f1db, table)
 
+            if args.overview or argc == 4:
+                driver.overview()
+
             if args.races:
                 driver.races()
             
             if args.pit_stops:
                 driver.pits()
-
-            if args.overview:
-                driver.overview()
 
             if args.qualifying:
                 driver.qualifying()
@@ -70,20 +71,19 @@ def main(args: argparse.Namespace):
             calendar = Calendar(args.year, f1db)
             calendar.calendar()
 
-        case "gp":
-            gp = GP(args.id, args.year, f1db, table)
+        case "race":
+            race = Race(args.id, args.year, f1db, table)
+            race.race()
 
-            if args.race:
-                gp.race()
+            if args.qualifying:
+                race.qualifying()
 
-            if args.sprint:
-                gp.sprint()
+        case "sprint":
+            sprint = Sprint(args.id, args.year, f1db, table)
+            sprint.sprint()
 
-            if args.race_qualifying:
-                gp.race_qualifying()
-
-            if args.sprint_qualifying:
-                gp.sprint_qualifying()
+            if args.qualifying:
+                sprint.qualifying()
 
         case "db":
             db = DB(f1db, table)
@@ -142,13 +142,15 @@ if __name__ == "__main__":
     driver_p.add_argument      ("-p", "--pit-stops",    action="store_true", help="Table of pit stops for each race")
     driver_p.add_argument      ("-o", "--overview",     action="store_true", help="An overview, driver statistics for a season")
     
-    race_p = subps.add_parser("gp",   help="Grand prix results tables")
-    race_p.add_argument      ("id",   metavar="ID",         type=str,             help="Grand prix id, e.g: monaco")
-    race_p.add_argument      ("year", metavar="YEAR",       type=str,             help="Year gp held")
-    race_p.add_argument      ("-r", "--race",               action="store_true",  help="Show race results")
-    race_p.add_argument      ("-s", "--sprint",             action="store_true",  help="Show sprint results")
-    race_p.add_argument      ("-rq", "--race-qualifying",   action="store_true",  help="Show race qualifying result")
-    race_p.add_argument      ("-sq", "--sprint-qualifying", action="store_true",  help="Show sprint qualifying result")
+    race_p = subps.add_parser("race",   help="Race result table")
+    race_p.add_argument      ("id",     metavar="ID",         type=str,     help="Grand prix id, e.g: monaco/china")
+    race_p.add_argument      ("year",   metavar="YEAR",       type=str,     help="Year of the race/gp")
+    race_p.add_argument      ("-q", "--qualifying",   action="store_true",  help="Show the qualifying result instead")
+
+    sprint_p = subps.add_parser("sprint",   help="Sprint result table")
+    sprint_p.add_argument      ("id",     metavar="ID",         type=str,     help="Grand prix id, e.g: monaco/china")
+    sprint_p.add_argument      ("year",   metavar="YEAR",       type=str,     help="Year of the sprint/gp")
+    sprint_p.add_argument      ("-q", "--qualifying",   action="store_true",  help="Show the qualifying result instead")
 
     champ_p = subps.add_parser("season", help="Fancy wikipedia like season table for driver/constructor championship")
     champ_p.add_argument      ("year", metavar="YEAR", type=str, help="Season year")

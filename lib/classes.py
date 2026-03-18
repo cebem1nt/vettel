@@ -91,7 +91,7 @@ class Base:
         self.table.flush()
         return True
 
-class GP(Base):    
+class Race(Base):
     def __init__(
         self,
         id: str, 
@@ -111,6 +111,9 @@ class GP(Base):
         self.table.headers = self.db.get_columns(6)
         comments = []
         dnfs_comments = []
+
+        if not rows:
+            return print(f"No race found: {self.id} - {self.year}")
 
         for is_fastest, is_pole, reason_retired, pts_pos_gained, \
             fastest_lap_gap, pos_gained, *row in rows:
@@ -146,6 +149,22 @@ class GP(Base):
             print(separator())
             print_comments(dnfs_comments)
 
+    def qualifying(self):
+        if not self.flush_script("gp-race-qualifying", {"id": self.id, "year": self.year}):
+            print(f"No qualifying found: {self.id} - {self.year}")
+
+class Sprint(Base):
+    def __init__(
+        self,
+        id: str, 
+        year: int,
+        db: F1DB,
+        table: Table
+    ):
+        super().__init__(db, table)
+        self.id = id
+        self.year = year
+
     def sprint(self):
         rows = self.db.run_script(
             "gp-sprint", {"id": self.id, "year": self.year}
@@ -170,12 +189,9 @@ class GP(Base):
         self.table.flush()
         print_comments(comments)
 
-    def sprint_qualifying(self):
-        if not self.flush_script("gp-sprint-qualifying"):
-            print(f"No sprint found: {self.id} - {self.year}")
-
-    def race_qualifying(self):
-        self.flush_script("gp-race-qualifying")
+    def qualifying(self):
+        if not self.flush_script("gp-sprint-qualifying", {"id": self.id, "year": self.year}):
+            print(f"No sprint qualifying found: {self.id} - {self.year}")
 
 class Driver(Base):
     def __init__(
