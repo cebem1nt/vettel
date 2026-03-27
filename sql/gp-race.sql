@@ -24,8 +24,6 @@ JOIN
 JOIN
     driver d on d.id = rd.driver_id
 JOIN
-    grand_prix on grand_prix.id = race.grand_prix_id
-JOIN
     constructor c on c.id = rd.constructor_id    
 LEFT JOIN    
     race_data fl on fl.race_id = rd.race_id

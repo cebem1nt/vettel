@@ -770,20 +770,29 @@ class Calendar:
 
     def calendar(self):
         fetched = self.db.run_script("calendar", [self.year])
+        
+        today = datetime.today()
+        is_current_found = False
 
         for rnd, gp, date, sprint_date, qualifying_date, sprint_qualifying_date in fetched:
-            date            = datetime.strptime(date, "%Y-%m-%d").strftime('%B %d, %Y')
-            qualifying_date = datetime.strptime(qualifying_date, "%Y-%m-%d").strftime('%B %d, %Y')
 
-            print(f"Round {rnd} - {gp}")
-            print(f"  * Race: {date}")
-            print(f"  * Race qualifying: {qualifying_date}")
+            is_current_stage = False
+            race_date = datetime.strptime(date, "%Y-%m-%d")
+            qualifying_date = datetime.strptime(qualifying_date, "%Y-%m-%d")
+
+            if (today < race_date) and not is_current_found:
+                is_current_stage = True
+                is_current_found = True
+
+            print(f"{"[*]" if is_current_stage else ""} Round {rnd} - {gp}")
+            print(f"  - Race: {race_date.strftime('%B %d, %Y')}")
+            print(f"  - Race qualifying: {qualifying_date.strftime('%B %d, %Y')}")
 
             if sprint_date:
-                sprint_date            = datetime.strptime(sprint_date, "%Y-%m-%d").strftime('%B %d, %Y')
-                sprint_qualifying_date = datetime.strptime(sprint_qualifying_date, "%Y-%m-%d").strftime('%B %d, %Y')
+                sprint_date = datetime.strptime(sprint_date, "%Y-%m-%d")
+                sprint_qualifying_date = datetime.strptime(sprint_qualifying_date, "%Y-%m-%d")
 
-                print(f"  * Sprint: {sprint_date}")
-                print(f"  * Sprint qualifying: {sprint_qualifying_date}")
+                print(f"  - Sprint: {sprint_date.strftime('%B %d, %Y')}")
+                print(f"  - Sprint qualifying: {sprint_qualifying_date.strftime('%B %d, %Y')}")
 
             print()
