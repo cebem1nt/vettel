@@ -73,17 +73,19 @@ def main(args: argparse.Namespace):
 
         case "race":
             race = Race(args.id, args.year, f1db, table)
-            race.race()
 
             if args.qualifying:
                 race.qualifying()
+            else:
+                race.race()
 
         case "sprint":
             sprint = Sprint(args.id, args.year, f1db, table)
-            sprint.sprint()
 
             if args.qualifying:
                 sprint.qualifying()
+            else:
+                sprint.sprint()
 
         case "db":
             db = DB(f1db, table)
