@@ -18,8 +18,8 @@ JOIN
 LEFT JOIN    
     race_data r on r.race_id = q.race_id and
     r.driver_id = q.driver_id and
-    r.type = 'SPRINT_RACE_RESULT'
+    r.type = 'RACE_RESULT'
 WHERE    
-    q.type = 'SPRINT_QUALIFYING_RESULT' and
-    race.grand_prix_id = :id and
+    q.type = 'QUALIFYING_RESULT' and
+    (race.grand_prix_id = :id or race.circuit_id = :id) and
     race.year = :year

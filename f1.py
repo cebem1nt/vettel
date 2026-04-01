@@ -143,12 +143,12 @@ if __name__ == "__main__":
     driver_p.add_argument      ("-o", "--overview",     action="store_true", help="An overview, driver statistics for a season")
     
     race_p = subps.add_parser("race",   help="Race result table")
-    race_p.add_argument      ("id",     metavar="ID",         type=str,     help="Grand prix id, e.g: monaco/china")
+    race_p.add_argument      ("id",     metavar="ID",         type=str,     help="Grand prix or circuit id, e.g: monaco/china, shanghai")
     race_p.add_argument      ("year",   metavar="YEAR",       type=str,     help="Year of the race/gp")
     race_p.add_argument      ("-q", "--qualifying",   action="store_true",  help="Show the qualifying result instead")
 
     sprint_p = subps.add_parser("sprint",   help="Sprint result table")
-    sprint_p.add_argument      ("id",     metavar="ID",         type=str,     help="Grand prix id, e.g: monaco/china")
+    sprint_p.add_argument      ("id",     metavar="ID",         type=str,     help="Grand prix or circuit id, e.g: monaco/china, shanghai")
     sprint_p.add_argument      ("year",   metavar="YEAR",       type=str,     help="Year of the sprint/gp")
     sprint_p.add_argument      ("-q", "--qualifying",   action="store_true",  help="Show the qualifying result instead")
 

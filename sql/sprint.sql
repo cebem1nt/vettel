@@ -19,5 +19,5 @@ JOIN
     constructor on constructor.id = r.constructor_id
 WHERE    
     r.type = 'SPRINT_RACE_RESULT' and
-    race.grand_prix_id = :id and
+    (race.grand_prix_id = :id or race.circuit_id = :id) and
     race.year = :year

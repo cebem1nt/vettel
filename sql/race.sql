@@ -33,7 +33,7 @@ LEFT JOIN
     race_driver_standing rds on rds.race_id = race.id
     and rds.driver_id = rd.driver_id
 WHERE 
-    race.grand_prix_id = :id and 
+    (race.grand_prix_id = :id or race.circuit_id = :id) and 
     race.year = :year and
     rd.type = 'RACE_RESULT'
 ORDER BY

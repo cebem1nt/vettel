@@ -105,7 +105,7 @@ class Race(Base):
 
     def race(self):
         rows = self.db.run_script(
-            "gp-race", {"id": self.id, "year": self.year}
+            "race", {"id": self.id, "year": self.year}
         )
 
         self.table.headers = self.db.get_columns(6)
@@ -150,7 +150,7 @@ class Race(Base):
             print_comments(dnfs_comments)
 
     def qualifying(self):
-        if not self.flush_script("gp-race-qualifying", {"id": self.id, "year": self.year}):
+        if not self.flush_script("race-qualifying", {"id": self.id, "year": self.year}):
             print(f"No qualifying found: {self.id} - {self.year}")
 
 class Sprint(Base):
@@ -167,7 +167,7 @@ class Sprint(Base):
 
     def sprint(self):
         rows = self.db.run_script(
-            "gp-sprint", {"id": self.id, "year": self.year}
+            "sprint", {"id": self.id, "year": self.year}
         )
 
         self.table.headers = self.db.get_columns(2)
@@ -190,7 +190,7 @@ class Sprint(Base):
         print_comments(comments)
 
     def qualifying(self):
-        if not self.flush_script("gp-sprint-qualifying", {"id": self.id, "year": self.year}):
+        if not self.flush_script("sprint-qualifying", {"id": self.id, "year": self.year}):
             print(f"No sprint qualifying found: {self.id} - {self.year}")
 
 class Driver(Base):
