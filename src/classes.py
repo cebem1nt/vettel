@@ -7,9 +7,9 @@ from statistics import mean, stdev, median, median_low, median_high, mode
 from collections import defaultdict
 from itertools import islice
 
-from lib.helpers import strsign, annotate_pf, ifnone, separator, print_comments, Streak
-from lib.tables import Table
-from lib.emoji import gp_flags
+from src.helpers import strsign, annotate_pf, ifnone, separator, print_comments, Streak
+from src.tables import Table
+from src.emoji import gp_flags
 
 class F1DB:
     def __init__(self, root_dir: str):

@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 import os, argparse, sys
 
-from lib.tables import Table
-from lib.classes import (
+from src.tables import Table
+from src.classes import (
     F1DB, 
     DB,
     Race,
