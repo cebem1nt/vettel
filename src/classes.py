@@ -284,9 +284,9 @@ class Driver(Base):
 
         for team, total in teams_played.items():
             if len(teams_played) == 1:
-                comments.append(f"All {total} games played in: {team}")
+                comments.append(f"All {total} races completed in: {team}")
             else:
-                comments.append(f"{total} games played in {team}")
+                comments.append(f"{total} races completed in {team}")
 
         self.table.flush()
         print_comments(comments)
