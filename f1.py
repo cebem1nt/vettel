@@ -72,7 +72,7 @@ def main(args: argparse.Namespace):
             calendar.calendar()
 
         case "race":
-            race = Race(args.id, args.year, f1db, table)
+            race = Race(args.id, args.year, f1db, table, args.full)
 
             if args.qualifying:
                 race.qualifying()
@@ -80,7 +80,7 @@ def main(args: argparse.Namespace):
                 race.race()
 
         case "sprint":
-            sprint = Sprint(args.id, args.year, f1db, table)
+            sprint = Sprint(args.id, args.year, f1db, table, args.full)
 
             if args.qualifying:
                 sprint.qualifying()
@@ -144,14 +144,16 @@ if __name__ == "__main__":
     driver_p.add_argument      ("-p", "--pit-stops",    action="store_true", help="Table of pit stops for each race")
     driver_p.add_argument      ("-o", "--overview",     action="store_true", help="An overview, driver statistics for a season")
     
-    race_p = subps.add_parser("race",   help="Race result table")
+    race_p = subps.add_parser("race",   help="Race results")
     race_p.add_argument      ("id",     metavar="ID",         type=str,     help="Grand prix or circuit id, e.g: monaco/china, shanghai")
     race_p.add_argument      ("year",   metavar="YEAR",       type=str,     help="Year of the race/gp")
+    race_p.add_argument      ("-f", "--full",         action="store_true",  help="Show full information table")
     race_p.add_argument      ("-q", "--qualifying",   action="store_true",  help="Show the qualifying result instead")
 
-    sprint_p = subps.add_parser("sprint",   help="Sprint result table")
+    sprint_p = subps.add_parser("sprint", help="Sprint results")
     sprint_p.add_argument      ("id",     metavar="ID",         type=str,     help="Grand prix or circuit id, e.g: monaco/china, shanghai")
     sprint_p.add_argument      ("year",   metavar="YEAR",       type=str,     help="Year of the sprint/gp")
+    sprint_p.add_argument      ("-f", "--full",         action="store_true",  help="Show full information table")
     sprint_p.add_argument      ("-q", "--qualifying",   action="store_true",  help="Show the qualifying result instead")
 
     champ_p = subps.add_parser("season", help="Fancy wikipedia like season table for driver/constructor championship")

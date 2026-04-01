@@ -97,26 +97,35 @@ class Race(Base):
         id: str, 
         year: int,
         db: F1DB,
-        table: Table
+        table: Table,
+        is_full: bool = False
     ):
         super().__init__(db, table)
         self.id = id
         self.year = year
+        self.is_full = is_full
+
+        if not self.is_full:
+            self.table.hide_delimiters = True
 
     def race(self):
         rows = self.db.run_script(
             "race", {"id": self.id, "year": self.year}
         )
 
-        self.table.headers = self.db.get_columns(6)
-        comments = []
-        dnfs_comments = []
-
         if not rows:
             return print(f"No race found: {self.id} - {self.year}")
 
-        for is_fastest, is_pole, reason_retired, pts_pos_gained, \
-            fastest_lap_gap, pos_gained, *row in rows:
+        if self.is_full:
+            self.table.headers = self.db.get_columns(6)
+        else:
+            self.table.headers = ["Driver", "Finish", "Points"]
+
+        comments = []
+        dnf_comments = []
+
+        for is_fastest, is_pole, reason_retired, pts_pos_gained, fastest_lap_gap, pos_gained, \
+            *row in rows:
             
             driver = row[0]
 
@@ -128,6 +137,9 @@ class Race(Base):
             if is_pole:
                 comments.append(f"Pole position: {driver}")
 
+            if reason_retired is not None:
+                dnf_comments.append(f"{driver} - Reason retired: {reason_retired}")
+
             if pos_gained:
                 row[3] += f" ({strsign(pos_gained)})"
 
@@ -137,21 +149,24 @@ class Race(Base):
             if fastest_lap_gap:
                 row[-5] += f" ({fastest_lap_gap})"
 
-            if reason_retired is not None:
-                dnfs_comments.append(f"{driver} - Reason retired: {reason_retired}")
+            if self.is_full:
+                self.table.add_row(row)
+            else:
+                self.table.add_row([row[0], row[3], row[-1]])
 
-            self.table.add_row(row)
-    
         self.table.flush()
         print_comments(comments)
 
-        if dnfs_comments:
+        if dnf_comments:
             print(separator())
-            print_comments(dnfs_comments)
+            print_comments(dnf_comments)
 
     def qualifying(self):
-        if not self.flush_script("race-qualifying", {"id": self.id, "year": self.year}):
-            print(f"No qualifying found: {self.id} - {self.year}")
+        script = "race-qualifying" if self.is_full else \
+                 "race-qualifying-small"
+
+        if not self.flush_script(script, {"id": self.id, "year": self.year}):
+            print(f"No race qualifying found: {self.id} - {self.year}")
 
 class Sprint(Base):
     def __init__(
@@ -159,38 +174,61 @@ class Sprint(Base):
         id: str, 
         year: int,
         db: F1DB,
-        table: Table
+        table: Table,
+        is_full: bool = False
     ):
         super().__init__(db, table)
         self.id = id
         self.year = year
+        self.is_full = is_full
+
+        if not self.is_full:
+            self.table.hide_delimiters = True
 
     def sprint(self):
         rows = self.db.run_script(
             "sprint", {"id": self.id, "year": self.year}
         )
 
-        self.table.headers = self.db.get_columns(2)
-        comments = []
-
         if not rows:
             return print(f"No sprint found: {self.id} - {self.year}")
 
+        if self.is_full:
+            self.table.headers = self.db.get_columns(2)
+        else:
+            self.table.headers = ["Driver", "Finish", "Points"]
+
+        comments = []
+        dnf_comments = []
+
         for pos_gained, reason_retired, *row in rows:
             
+            if row[2] == "1":
+                comments.append(f"Pole position: {row[0]}")
+
             if pos_gained:
                 row[3] += f" ({strsign(pos_gained)})"
 
             if reason_retired is not None:
-                comments.append(f"{row[0]} - Reason retired: {reason_retired}")
+                dnf_comments.append(f"{row[0]} - Reason retired: {reason_retired}")
 
-            self.table.add_row(row)
+            if self.is_full:
+                self.table.add_row(row)
+            else:
+                self.table.add_row([row[0], row[3], row[-1]])
 
         self.table.flush()
         print_comments(comments)
 
+        if dnf_comments:
+            print(separator())
+            print_comments(dnf_comments)
+
     def qualifying(self):
-        if not self.flush_script("sprint-qualifying", {"id": self.id, "year": self.year}):
+        script = "sprint-qualifying" if self.is_full else \
+                 "sprint-qualifying-small"
+
+        if not self.flush_script(script, {"id": self.id, "year": self.year}):
             print(f"No sprint qualifying found: {self.id} - {self.year}")
 
 class Driver(Base):
