@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 import os, argparse, sys
 
-from src.tables import Table
-from src.classes import (
+from vettel.tables import Table
+from vettel.classes import (
     F1DB, 
     DB,
     Race,
@@ -20,10 +20,7 @@ def main(args: argparse.Namespace):
         args.no_delimiters
     )
 
-    f1db = F1DB(
-        root_dir=os.path.dirname(os.path.realpath(__file__))
-    ) 
-
+    f1db = F1DB() 
     argc = len(sys.argv)
 
     match args.command:

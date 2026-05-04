@@ -7,9 +7,9 @@ from statistics import mean, stdev, median, median_low, median_high, mode
 from collections import defaultdict
 from itertools import islice
 
-from src.helpers import strsign, annotate_pf, ifnone, separator, print_comments, Streak
-from src.tables import Table
-from src.emoji import gp_flags
+from vettel.helpers import strsign, annotate_pf, ifnone, separator, print_comments, Streak
+from vettel.tables import Table
+from vettel.emoji import gp_flags
 
 DB_SOURCE = "https://github.com/f1db/f1db/releases/latest/download/f1db-sqlite.zip"
 DB_NAME = "f1db.db"
@@ -22,8 +22,9 @@ class F1DB:
 
     db_file = os.path.join(db_dir, DB_NAME)
 
-    def __init__(self, root_dir: str):
-        self.sql_scripts_dir = os.path.join(root_dir, "sql")
+    def __init__(self):
+        self.root_dir = os.path.dirname(os.path.realpath(__file__))
+        self.sql_scripts_dir = os.path.join(self.root_dir, "sql")
         
         try:
             self.con = sqlite3.connect(self.db_file)
@@ -33,7 +34,6 @@ class F1DB:
             exit(0)
 
         self.cur = self.con.cursor()
-        self.root_dir = root_dir
 
     def run_script(
         self, 
