@@ -88,10 +88,71 @@ Lance Stroll - Reason retired: Mechanical
 Oliver Bearman - Reason retired: Accident
 ```
 
-Other:
 ```sh
 # Get 2023 max verstappen overview/statistics:
 python3 vet.py driver max-verstappen 2023
+```
+```
+Season overview — max-verstappen (2023)
+--------------------------------------------------
+Races: 22  Finished: 22  Not finished/started: 0  (rate: 0.0%)
+
+Points
+- Total pts: 575 pts (1 place)
+- Team pts share: 66.86%
+- Pts per race: 26.14 pts
+- Avg pts when scoring: 26.14 pts
+- Points volatility (std): 3.78 pts
+
+Qualifying & starts
+- Poles: 12  (Pole rate: 54.5%)
+- Q1, Q2 eliminations: 3 (rate: 13.6%)
+- Q3 appearances: 19
+- Pole conversion (poles / Q3s): 63.2%
+- Avg grid position: 3.18
+- Median grid position: 1.00
+- Most common grid position: 1
+- Penalties: 0
+
+Results & rates
+- Wins: 19  (Win rate: 86.4%)
+- Podiums: 21  (Podium rate: 95.5%)
+- Scoring finishes: 22  (Scoring rate: 100.0%)
+- Fastest laps: 9  (Fastest-lap rate: 40.9%)
+- Finish rate: 100.0%
+- Avg finish position: 1.27
+- Median finish position: 1.00
+- Most common finish position: 1
+- Finish position CV (coefficient of variation): 0.694
+
+Pit stops & strategy
+- Avg pit stops per race: 2.18
+- Avg pit stops time: 22.97s
+- Problematic pit stops: 6
+
+Not started/finished/classified, disqualified:
+- DNF: 0 (0.0%)
+- DNS: 0 (0.0%)
+- DSQ: 0 (0.0%)
+- NC: 0 (0.0%)
+
+Race progress
+- Avg positions gained per race: 4.67
+- Races net gain: 40.9%
+- Races net loss: 0.0%
+- Races no change: 59.1%
+- Longest podium streak: 14
+  * (2023, 'bahrain') ... (2023, 'italy')
+- Longest win streak: 10
+  * (2023, 'miami') ... (2023, 'italy')
+- Longest points streak: 22
+  * (2023, 'bahrain') ... (2023, 'abu-dhabi')
+```
+
+Other:
+```sh
+# Get 2023 max verstappen race results table:
+python3 vet.py driver max-verstappen 2023 --races
 ```
 ```sh
 # Get best lap time at suzuka circuit
