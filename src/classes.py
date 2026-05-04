@@ -812,25 +812,38 @@ class Calendar:
         today = datetime.today()
         is_current_found = False
 
-        for rnd, gp, date, sprint_date, qualifying_date, sprint_qualifying_date in fetched:
+        format_time = lambda t: t.strftime('%b %d')
+
+        for rnd, gp, race_date, race_time, \
+                     sprint_date, sprint_time, \
+                     quali_date, quali_time, \
+                     sprint_quali_date, sprint_quali_time in fetched:
 
             is_current_stage = False
-            race_date = datetime.strptime(date, "%Y-%m-%d")
-            qualifying_date = datetime.strptime(qualifying_date, "%Y-%m-%d")
+            race_date = datetime.strptime(race_date, "%Y-%m-%d")
+            quali_date = datetime.strptime(quali_date, "%Y-%m-%d")
 
             if (today < race_date) and not is_current_found:
                 is_current_stage = True
                 is_current_found = True
 
-            print(f"{"[*]" if is_current_stage else ""} Round {rnd} - {gp}")
-            print(f"  - Race: {race_date.strftime('%B %d, %Y')}")
-            print(f"  - Race qualifying: {qualifying_date.strftime('%B %d, %Y')}")
+            separator_width = 35
+
+            round_string = f"Round {rnd} - {gp}"
+            if is_current_stage:
+                round_string = "-*- " + round_string + " -*-"
+            
+            print(round_string.center(separator_width + 2))
+            print("  " + ('-' * separator_width))
 
             if sprint_date:
                 sprint_date = datetime.strptime(sprint_date, "%Y-%m-%d")
-                sprint_qualifying_date = datetime.strptime(sprint_qualifying_date, "%Y-%m-%d")
+                sprint_quali_date = datetime.strptime(sprint_quali_date, "%Y-%m-%d")
 
-                print(f"  - Sprint: {sprint_date.strftime('%B %d, %Y')}")
-                print(f"  - Sprint qualifying: {sprint_qualifying_date.strftime('%B %d, %Y')}")
+                print(f"  - Sprint qualifying: {format_time(sprint_quali_date)} - {sprint_quali_time}")
+                print(f"  - Sprint:            {format_time(sprint_date)} - {sprint_time}")
+
+            print(f"  - Qualifying:        {format_time(quali_date)} - {quali_time}")
+            print(f"  - Race:              {format_time(race_date)} - {race_time}")
 
             print()

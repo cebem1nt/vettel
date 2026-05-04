@@ -1,5 +1,5 @@
-# f1-stats
-A cli tool to fetch different statistics about formula 1 using [f1db](https://github.com/f1db/f1db)
+# vettel
+A cli tool to fetch different statistics and info about formula 1 using [f1db](https://github.com/f1db/f1db)
 
 ## Features
 You can fetch plenty of different tables and statistics: 
@@ -14,7 +14,7 @@ You can fetch plenty of different tables and statistics:
 
 ```sh
 # The season tables
-python f1.py season 2023 --flags >> README.md
+python vet.py season 2023 --flags >> README.md
 ```
 
 | pos | name             | 🇧🇭 BHR | 🇸🇦 SAU | 🇦🇺 AUS | 🇦🇿 AZE | 🇺🇸 MIA | 🇲🇨 MCO | 🇪🇸 ESP | 🇨🇦 CAN | 🇦🇹 AUT | 🇬🇧 GBR | 🇭🇺 HUN | 🇧🇪 BEL | 🇳🇱 NLD | 🇮🇹 ITA | 🇸🇬 SGP | 🇯🇵 JPN | 🇶🇦 QAT | 🇺🇸 USA | 🇲🇽 MEX | 🇧🇷 SAO | 🇺🇸 LAS | 🇦🇪 ABD | pts |

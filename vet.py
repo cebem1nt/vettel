@@ -52,7 +52,7 @@ def main(args: argparse.Namespace):
         case "driver":
             driver = Driver(args.id, args.year, f1db, table)
 
-            if args.overview or argc == 3:
+            if args.overview or argc == 3 or (argc == 4 and args.year):
                 driver.overview()
 
             if args.races:
