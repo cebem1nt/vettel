@@ -1,4 +1,4 @@
-import sqlite3, os, subprocess
+import sqlite3, os, subprocess, sys
 
 from datetime import datetime
 from typing import Iterable, Optional, Tuple, Any
@@ -11,11 +11,27 @@ from src.helpers import strsign, annotate_pf, ifnone, separator, print_comments,
 from src.tables import Table
 from src.emoji import gp_flags
 
+DB_SOURCE = "https://github.com/f1db/f1db/releases/latest/download/f1db-sqlite.zip"
+DB_NAME = "f1db.db"
+
 class F1DB:
+    if (xdg := os.getenv("XDG_DATA_HOME")):
+        db_dir = os.path.join(xdg, "vettel")
+    else:
+        db_dir = os.path.expanduser("~/.local/share/vettel")
+
+    db_file = os.path.join(db_dir, DB_NAME)
+
     def __init__(self, root_dir: str):
         self.sql_scripts_dir = os.path.join(root_dir, "sql")
-        self.db_file = os.path.join(root_dir, "data", "f1db.db")
-        self.con = sqlite3.connect(self.db_file)
+        
+        try:
+            self.con = sqlite3.connect(self.db_file)
+        except:
+            print("No database found, installing...")
+            self.update()
+            exit(0)
+
         self.cur = self.con.cursor()
         self.root_dir = root_dir
 
@@ -51,12 +67,33 @@ class F1DB:
         )
 
     def update(self):
-        os.chdir(self.root_dir)
-        subprocess.run(
-            [os.path.join(self.root_dir, "init")], check=True
-        )
+        os.makedirs(self.db_dir, exist_ok=True)
+        os.chdir(self.db_dir)
+        
+        if os.path.exists(self.db_file):
+            os.remove(self.db_file) 
 
-    def execute(self, sql: str, params: Optional[Iterable] ) -> list[Any]:
+        zip_file = "f1db-sqlite.zip"
+
+        print(f"Clonning database: {DB_SOURCE}...")
+        wget_proc = subprocess.run(["wget", DB_SOURCE], check=True, 
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+        if wget_proc.returncode != 0:
+            sys.stderr.write("Could not clone, perhaps wget is not installed?\n")
+            exit(1)
+
+        print(f"Extracting {zip_file}...")
+        unzip_proc = subprocess.run(["unzip", zip_file], check=True)
+
+        if unzip_proc.returncode != 0:
+            sys.stderr.write("Could not unzip, perhaps unzip is not installed?\n")
+            exit(1)
+
+        print("Database was clonned successfully!")
+        os.remove(zip_file)
+
+    def execute(self, sql: str, params: Optional[Iterable]) -> list[Any]:
         self.cur.execute(sql, params)
         return self.cur.fetchall()
 
