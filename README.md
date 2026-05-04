@@ -21,7 +21,7 @@ A cli tool to fetch different statistics and info about formula 1 using [f1db](h
 
 Season results table
 ```sh
-python vet.py season 2023 --flags >> README.md
+vet season 2023 --flags >> README.md
 ```
 
 | pos | name             | 🇧🇭 BHR | 🇸🇦 SAU | 🇦🇺 AUS | 🇦🇿 AZE | 🇺🇸 MIA | 🇲🇨 MCO | 🇪🇸 ESP | 🇨🇦 CAN | 🇦🇹 AUT | 🇬🇧 GBR | 🇭🇺 HUN | 🇧🇪 BEL | 🇳🇱 NLD | 🇮🇹 ITA | 🇸🇬 SGP | 🇯🇵 JPN | 🇶🇦 QAT | 🇺🇸 USA | 🇲🇽 MEX | 🇧🇷 SAO | 🇺🇸 LAS | 🇦🇪 ABD | pts |
@@ -51,7 +51,7 @@ python vet.py season 2023 --flags >> README.md
 
 Race results:
 ```sh
-python vet.py race japan 2026 # pass --full to get more info
+vet race japan 2026 # pass --full to get more info
 ```
 ```
   Driver              Finish    Points
@@ -192,8 +192,6 @@ yay -S vettel # Or with any other aur helper like paru
 <details>
   <summary>From source</summary>
 
-  Clone this repo somewhere (**do not delete after installation**)
-
   ```sh
   git clone https://github.com/cebem1nt/vettel.git
   cd vettel
@@ -203,7 +201,7 @@ yay -S vettel # Or with any other aur helper like paru
   # Install systemwide with python
   sudo python setup.py install --optimize=1
   ```
-  
+
 </details>
 
 To get new info, update [f1db](https://github.com/f1db/f1db) once in a while with:
