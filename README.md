@@ -89,7 +89,7 @@ Oliver Bearman - Reason retired: Accident
 
 ```sh
 # Get 2023 max verstappen overview/statistics:
-python3 vet.py driver max-verstappen 2023
+vet driver max-verstappen 2023
 ```
 ```
 Season overview — max-verstappen (2023)
@@ -151,54 +151,65 @@ Race progress
 Other:
 ```sh
 # Get 2023 max verstappen race results table:
-python3 vet.py driver max-verstappen 2023 --races
+vet driver max-verstappen 2023 --races
 ```
 ```sh
 # Get best lap time at suzuka circuit
-python3 vet.py circuit suzuka --best-lap
+vet circuit suzuka --best-lap
 ```
 ```sh
 # Show driver with most wins, most podiums at silverstone circuit
-python3 vet.py circuit silverstone -mw -mp
+vet circuit silverstone -mw -mp
 ```
 ```sh
 # Show 2026 constructor standings
-python3 vet.py season 2026 --constructor
+vet season 2026 --constructor
 ```
 ```sh
 # Show 2026 miami sprint qualifying results
-python3 vet.py sprint miami 2026 -q
+vet sprint miami 2026 -q
 ```
 ```sh
 # Show 2026 gp calendar
-python3 vet.py calendar 2026
+vet calendar 2026
 ```
 ```sh
 # Search database for driver with "max"
-python3 vet.py db --search -d max
+vet db --search -d max
 ```
 ```sh
 # Execute some sql script for db
-python3 vet.py db --sql my_hacky.sql
+vet db --sql my_hacky.sql
 ```
 
 ## Installation
 
-Clone this repo somewhere (**do not delete after installation**)
+### AUR:
+```sh
+yay -S vettel # Or with any other aur helper like paru
+```
+
+<details>
+  <summary>From source</summary>
+
+  Clone this repo somewhere (**do not delete after installation**)
+
+  ```sh
+  git clone https://github.com/cebem1nt/vettel.git
+  cd vettel
+  ```
+
+  ```sh
+  # Install systemwide with python
+  sudo python setup.py install --optimize=1
+  ```
+  
+</details>
+
+To get new info, update [f1db](https://github.com/f1db/f1db) once in a while with:
 
 ```sh
-git clone https://github.com/cebem1nt/vettel.git
-```
-
-```sh
-cd vettel
-./init # Set up the db
-```
-
-Update [f1db](https://github.com/f1db/f1db) once in a while with:
-
-```
-python vet.py db --update
+vet db --update
 ```
 
 ## Misc
