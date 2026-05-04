@@ -4,16 +4,24 @@ A cli tool to fetch different statistics and info about formula 1 using [f1db](h
 ## Features
 You can fetch plenty of different tables and statistics: 
 
-- Season tables (driver/constructor standings) in [wikipedia like style](https://en.wikipedia.org/wiki/2025_Formula_One_World_Championship#World_Drivers'_Championship_standings)
+- **Drivers statistics during year/all time: total points, poles, q3 apearences, average points, grid positions, diferent rates, streaks and much more**
 
-- Detailed info about season races, qualifications, pit stop times
+- **Season tables (driver/constructor standings) in [wikipedia like style](https://en.wikipedia.org/wiki/2025_Formula_One_World_Championship#World_Drivers'_Championship_standings)**
 
-- circuits all time records: best lap times, best qualification times, driver with most wins, most podiums. 
+- **Detailed info about season races, sprints, qualifications**
+
+- **Pit stop times**
+
+- **Season calendar**
+
+- **Circuits all time records: best lap times, best qualification times, driver with most wins, most podiums.**
+
+- **Fully offline: Info fetched from local database**
 
 ## Examples
 
+Season results table
 ```sh
-# The season tables
 python vet.py season 2023 --flags >> README.md
 ```
 
@@ -42,278 +50,102 @@ python vet.py season 2023 --flags >> README.md
 | 21  | Logan Sargeant   | 12     | 16     | 16     | 16     | 20     | 18     | 20     | DNF    | 13     | 11     | 18     | 17     | DNF    | 13     | 14     | DNF    | DNF    | 10     | 16     | 11     | 16     | 16     | 1   |
 | 22  | Nyck de Vries    | 14     | 14     | 15     | DNF    | 18     | 12     | 14     | 18     | 17     | 17     |        |        |        |        |        |        |        |        |        |        |        |        | 0   |
 
+Race results:
 ```sh
-# Season overview (different statistics)
-python f1.py driver fernando-alonso 2012 -o
+python vet.py race japan 2026 # pass --full to get more info
 ```
+```
+  Driver              Finish    Points
 
-```
-Season overview — fernando-alonso (2012)
+  Kimi Antonelli      1         25
+  Oscar Piastri       2 (+1)    18
+  Charles Leclerc     3 (+1)    15
+  George Russell      4 (-2)    12
+  Lando Norris        5         10
+  Lewis Hamilton      6         8
+  Pierre Gasly        7         6
+  Max Verstappen      8 (+3)    4
+  Liam Lawson         9 (+5)    2
+  Esteban Ocon        10 (+2)   1
+  Nico Hülkenberg     11 (+2)
+  Isack Hadjar        12 (-4)
+  Gabriel Bortoleto   13 (-4)
+  Arvid Lindblad      14 (-4)
+  Carlos Sainz Jr.    15 (+1)
+  Franco Colapinto    16 (-1)
+  Sergio Pérez        17 (+2)
+  Fernando Alonso     18 (+3)
+  Valtteri Bottas     19 (+1)
+  Alexander Albon     20 (-3)
+  Lance Stroll        DNF
+  Oliver Bearman      DNF
+
+Fastest lap: Kimi Antonelli - 1:32.432 (lap 49)
+Pole position: Kimi Antonelli
+
 --------------------------------------------------
-Races: 20  Finished: 18  Not finished/started: 2  (rate: 10.0%)
-
-Points
-- Total pts: 278 pts (2 place)
-- Team pts share: 69.50%
-- Pts per race: 13.90 pts
-- Avg pts when scoring: 15.44 pts
-- Points volatility (std): 7.59 pts
-
-Qualifying & starts
-- Poles: 2  (Pole rate: 10.0%)
-- Q1, Q2 eliminations: 3 (rate: 15.0%)
-- Q3 appearances: 17
-- Pole conversion (poles / Q3s): 11.8%
-- Avg grid position: 6.10
-- Median grid position: 6.00
-- Most common grid position: 2
-- Penalties: 0
-
-Results & rates
-- Wins: 3  (Win rate: 15.0%)
-- Podiums: 13  (Podium rate: 65.0%)
-- Scoring finishes: 18  (Scoring rate: 90.0%)
-- Fastest laps: 0  (Fastest-lap rate: 0.0%)
-- Finish rate: 90.0%
-- Avg finish position: 3.28
-- Median finish position: 3.00
-- Most common finish position: 2
-- Finish position CV (coefficient of variation): 0.660
-
-Pit stops & strategy
-- Avg pit stops per race: 1.94
-- Avg pit stops time: 21.91s
-- Problematic pit stops: 0
-
-Not started/finished/classified, disqualified:
-- DNF: 2 (10.0%)
-  * belgium - Collision
-  * japan - Collision
-- DNS: 0 (0.0%)
-- DSQ: 0 (0.0%)
-- NC: 0 (0.0%)
-
-Race progress
-- Avg positions gained per race: 3.47
-- Races net gain: 72.2%
-- Races net loss: 11.1%
-- Races no change: 16.7%
-- Longest podium streak: 5
-  * (2012, 'korea') ... (2012, 'brazil')
-- Longest win streak: 1
-  * (2012, 'malaysia') ... (2012, 'malaysia')
-- Longest points streak: 11
-  * (2012, 'australia') ... (2012, 'hungary')
+Lance Stroll - Reason retired: Mechanical
+Oliver Bearman - Reason retired: Accident
 ```
 
+Other:
 ```sh
-# All time overview
-python f1.py driver fernando-alonso -o
+# Get 2023 max verstappen overview/statistics:
+python3 vet.py driver max-verstappen 2023
 ```
-
-```
- python f1.py driver fernando-alonso -o
-
-Season overview — fernando-alonso (All time)
---------------------------------------------------
-Races: 428  Finished: 353  Not finished/started: 75  (rate: 17.5%)
-
-Points
-- Total pts: 2393 pts (10 place)
-- Team pts share: 70.44%
-- Pts per race: 5.59 pts
-- Avg pts when scoring: 8.52 pts
-- Points volatility (std): 6.20 pts
-
-Qualifying & starts
-- Poles: 22  (Pole rate: 5.1%)
-- Q1, Q2 eliminations: 187 (rate: 43.7%)
-- Q3 appearances: 241
-- Pole conversion (poles / Q3s): 9.1%
-- Avg grid position: 8.68
-- Median grid position: 8.00
-- Most common grid position: 2
-- Penalties: 7
-
-Results & rates
-- Wins: 32  (Win rate: 7.5%)
-- Podiums: 106  (Podium rate: 24.8%)
-- Scoring finishes: 281  (Scoring rate: 65.7%)
-- Fastest laps: 26  (Fastest-lap rate: 6.1%)
-- Finish rate: 82.5%
-- Avg finish position: 6.67
-- Median finish position: 6.00
-- Most common finish position: 2
-- Finish position CV (coefficient of variation): 0.660
-
-Pit stops & strategy
-- Avg pit stops per race: 2.00
-- Avg pit stops time: 24.65s
-- Problematic pit stops: 34
-
-Not started/finished/classified, disqualified:
-- DNF: 73 (17.1%)
-  * brazil - Electrical
-  * san-marino - Brakes
-  * austria - Gearbox
-  * monaco - Gearbox
-  * canada - Transmission
-  * hungary - Brakes
-  * belgium - Gearbox
-  * united-states - Driveshaft
-  * austria - Engine
-  * france - Engine
-  * great-britain - Gearbox
-  * united-states - Engine
-  * japan - Engine
-  * monaco - Accident
-  * canada - Driveshaft
-  * united-states - Puncture
-  * belgium - Engine
-  * italy - Spun off
-  * canada - Suspension
-  * hungary - Wheel nut
-  * italy - Engine
-  * japan - Accident
-  * spain - Engine
-  * canada - Spun off
-  * europe - Collision damage
-  * hungary - Wheel
-  * belgium - Wheel
-  * brazil - Collision
-  * belgium - Accident
-  * canada - Collision
-  * belgium - Collision
-  * japan - Collision
-  * malaysia - Collision damage
-  * italy - Engine
-  * japan - Electrical
-  * malaysia - Power unit
-  * spain - Brakes
-  * monaco - Gearbox
-  * canada - Exhaust
-  * austria - Collision
-  * singapore - Gearbox
-  * mexico - Power unit
-  * australia - Collision
-  * spain - Power unit
-  * europe - Gearbox
-  * australia - Broken floor
-  * china - Driveshaft
-  * austria - Collision damage
-  * great-britain - Fuel pump
-  * belgium - Power unit
-  * singapore - Collision damage
-  * united-states - Engine
-  * monaco - Gearbox
-  * canada - Exhaust
-  * belgium - Collision
-  * italy - Electrical
-  * united-states - Collision
-  * mexico - Water pressure
-  * bahrain - Brakes
-  * united-states - Rear wing
-  * saudi-arabia - Water pressure
-  * emilia-romagna - Collision damage
-  * italy - Water pressure
-  * singapore - Engine
-  * abu-dhabi - Water leak
-  * united-states - Undertray
-  * mexico - Collision damage
-  * mexico - Brakes
-  * australia - Accident
-  * china - Brakes
-  * monaco - Engine
-  * italy - Suspension
-  * mexico - Brakes
-- DNS: 2 (0.5%)
-  * united-states - Withdrew
-  * russia - Gearbox
-- DSQ: 0 (0.0%)
-- NC: 0 (0.0%)
-
-Race progress
-- Avg positions gained per race: 1.92
-- Races net gain: 60.3%
-- Races net loss: 24.4%
-- Races no change: 15.3%
-- Longest podium streak: 15
-  * (2005, 'turkey') ... (2006, 'canada')
-- Longest win streak: 4
-  * (2006, 'spain') ... (2006, 'canada')
-- Longest points streak: 23
-  * (2011, 'europe') ... (2012, 'hungary')
-```
-
 ```sh
-# Circuit records
-python f1.py circuit monza --best-lap --rows=5
+# Get best lap time at suzuka circuit
+python3 vet.py circuit suzuka --best-lap
 ```
-
-```
-|   | year | driver             | finish | lap | time     | tyre        | engine     | constructor |
-|---|------|--------------------|--------|-----|----------|-------------|------------|-------------|
-| 1 | 2025 | Lando Norris       | 2      | 53  | 1:20.901 | pirelli     | mercedes   | mclaren     |
-| 2 | 2025 | Max Verstappen     | 1      | 52  | 1:21.003 | pirelli     | honda-rbpt | red-bull    |
-| 3 | 2004 | Rubens Barrichello | 1      | 41  | 1:21.046 | bridgestone | ferrari    | ferrari     |
-| 4 | 2025 | Oscar Piastri      | 3      | 47  | 1:21.245 | pirelli     | mercedes   | mclaren     |
-| 5 | 2025 | Charles Leclerc    | 4      | 53  | 1:21.294 | pirelli     | ferrari    | ferrari     |
-```
-
 ```sh
-# You can also chain flags
-python f1.py driver max-verstappen 2025 --pit-stops --sprints
+# Show driver with most wins, most podiums at silverstone circuit
+python3 vet.py circuit silverstone -mw -mp
 ```
+```sh
+# Show 2026 constructor standings
+python3 vet.py season 2026 --constructor
 ```
-|                | pit 1           | pit 2           | pit 3           | pit 4           | pit 5           |   |
-|----------------|-----------------|-----------------|-----------------|-----------------|-----------------|---|
-| Australia      | lap 2 - 13.416  | lap 3 - 13.740  | lap 4 - 12.938  | lap 34 - 18.700 | lap 46 - 18.721 | 5 |
-| China          | lap 13 - 22.454 |                 |                 |                 |                 | 1 |
-| Japan          | lap 21 - 24.397 |                 |                 |                 |                 | 1 |
-| Bahrain        | lap 10 - 26.518 | lap 26 - 28.067 |                 |                 |                 | 2 |
-| Saudi Arabia   | lap 21 - 26.030 |                 |                 |                 |                 | 1 |
-| Miami          | lap 26 - 22.501 |                 |                 |                 |                 | 1 |
-| Emilia Romagna | lap 29 - 29.991 | lap 46 - 29.657 |                 |                 |                 | 2 |
-| Monaco         | lap 28 - 24.114 | lap 77 - 23.950 |                 |                 |                 | 2 |
-| Spain          | lap 13 - 21.869 | lap 29 - 21.933 | lap 47 - 21.802 | lap 55 - 22.197 |                 | 4 |
-| Canada         | lap 12 - 23.604 | lap 37 - 23.121 |                 |                 |                 | 2 |
-| Great Britain  | lap 11 - 28.182 | lap 41 - 29.689 |                 |                 |                 | 2 |
-| Belgium        | lap 12 - 25.913 |                 |                 |                 |                 | 1 |
-| Hungary        | lap 17 - 21.433 | lap 48 - 21.258 |                 |                 |                 | 2 |
-| Netherlands    | lap 23 - 18.740 | lap 53 - 18.261 |                 |                 |                 | 2 |
-| Italy          | lap 37 - 24.545 |                 |                 |                 |                 | 1 |
-| Azerbaijan     | lap 40 - 20.221 |                 |                 |                 |                 | 1 |
-| Singapore      | lap 19 - 24.008 |                 |                 |                 |                 | 1 |
-| United States  | lap 33 - 23.987 |                 |                 |                 |                 | 1 |
-| Mexico         | lap 37 - 22.762 |                 |                 |                 |                 | 1 |
-| São Paulo      | lap 7 - 23.197  | lap 34 - 23.058 | lap 54 - 23.311 |                 |                 | 3 |
-| Las Vegas      | lap 25 - 21.708 |                 |                 |                 |                 | 1 |
-| Qatar          | lap 7 - 29.970  | lap 32 - 28.168 |                 |                 |                 | 2 |
-| Abu Dhabi      | lap 23 - 21.703 |                 |                 |                 |                 | 1 |
-
-
-| name          | q1       | q2       | q3       | gap    | interval | laps | start | finish | gained | penalty | gap     | interval | pts |
-|---------------|----------|----------|----------|--------|----------|------|-------|--------|--------|---------|---------|----------|-----|
-| China         | 1:31.916 | 1:31.521 | 1:30.867 | +0.018 | +0.018   | 12   | 2     | 3      | -1     |         | +9.804  | +2.915   | 6   |
-| Miami         | 1:27.953 | 1:27.245 | 1:26.737 | +0.255 | +0.155   | 16   | 4     | 17     | -13    | 10.000  | +12.059 | +2.150   |     |
-| Belgium       | 1:42.043 | 1:41.583 | 1:40.987 | +0.477 | +0.477   | 9    | 2     | 1      | 1      |         |         |          | 8   |
-| United States | 1:33.363 | 1:33.163 | 1:32.143 |        |          | 12   | 1     | 1      | 0      |         |         |          | 8   |
-| São Paulo     | 1:09.975 | 1:09.707 | 1:09.580 | +0.337 | +0.084   | 15   | 6     | 4      | 2      |         | +4.423  | +2.105   | 5   |
-| Qatar         | 1:21.172 | 1:21.036 | 1:20.528 | +0.473 | +0.009   | 20   | 6     | 4      | 2      |         | +9.054  | +2.775   | 5   |
+```sh
+# Show 2026 miami sprint qualifying results
+python3 vet.py sprint miami 2026 -q
+```
+```sh
+# Show 2026 gp calendar
+python3 vet.py calendar 2026
+```
+```sh
+# Search database for driver with "max"
+python3 vet.py db --search -d max
+```
+```sh
+# Execute some sql script for db
+python3 vet.py db --sql my_hacky.sql
 ```
 
 ## Installation
 
+Clone this repo somewhere (**do not delete after installation**)
+
 ```sh
-git clone https://github.com/cebem1nt/f1-stats.git
-cd f1-stats
+git clone https://github.com/cebem1nt/vettel.git
+```
+
+```sh
+cd vettel
 ./init # Set up the db
+```
+
+Update [f1db](https://github.com/f1db/f1db) once in a while with:
+
+```
+python vet.py db --update
 ```
 
 ## Misc
 
 ```
-usage: f1.py [-h] [--double-headers] [--no-delimiters] [--adjustment {left,center,right}] {circuit,driver,race,sprint,season,calendar,db} ...
+usage: vet [-h] [--double-headers] [--no-delimiters] [--adjustment {left,center,right}]
+           {circuit,driver,race,sprint,season,calendar,db} ...
 
 Diferrent charts, statistics, records, all time bests of Formula One
 
@@ -322,8 +154,8 @@ positional arguments:
                         Available commands
     circuit             Get different records for a circuit
     driver              Different driver's statistics, data over the season or all time
-    race                Race result table
-    sprint              Sprint result table
+    race                Race results
+    sprint              Sprint results
     season              Fancy wikipedia like season table for driver/constructor championship
     calendar            Dates/calendar for a given season
     db                  Different database related commands
