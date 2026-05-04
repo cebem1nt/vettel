@@ -13,7 +13,7 @@ from vettel.classes import (
     Calendar
 )
 
-def main(args: argparse.Namespace):
+def match_args(args: argparse.Namespace):
     table = Table(
         args.adjustment,
         args.double_headers,
@@ -114,7 +114,7 @@ def main(args: argparse.Namespace):
         case _:
             print(f"Unknown command: {args.command}")
 
-if __name__ == "__main__":
+def main():
     p = argparse.ArgumentParser(description="Diferrent charts, statistics, records, all time bests of Formula One")
 
     subps = p.add_subparsers(dest="command", help="Available commands")
@@ -175,6 +175,9 @@ if __name__ == "__main__":
     args = p.parse_args()
 
     if any(vars(args).values()) and args.command:
-        main(args)
+        match_args(args)
     else:
         p.print_help()
+
+if __name__ == "__main__":
+    main()
