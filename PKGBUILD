@@ -1,4 +1,4 @@
-# Maintainer: cebem1nt <cebemnt@gmail.com>
+# Maintainer: cebem1nt <cebem1nt@gmail.com>
 
 pkgname=vettel
 pkgver=1.0.0
