@@ -2,7 +2,6 @@
 A cli tool to fetch different statistics and info about formula 1 using [f1db](https://github.com/f1db/f1db)
 
 ## Features
-You can fetch plenty of different tables and statistics: 
 
 - **Drivers statistics during year/all time: total points, poles, q3 apearences, average points, grid positions, diferent rates, streaks and much more**
 
