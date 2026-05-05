@@ -586,7 +586,8 @@ class Driver(Base):
 
         print(f"\nSeason overview — {self.id} ({self.year if self.year else "All time"})")
         print("-" * 50)
-        print(f"Races: {total["races"]}  Finished: {total["finished"]}  Not finished/started: {not_finished}  (rate: {not_finished_rate:.1%})\n")
+        print(f"Races: {total["races"]}  Finished: {total["finished"]}  Not finished/started: {not_finished} ",
+              f"(rate: {not_finished_rate:.1%})" if not_finished else '', end="\n\n")
 
         print("Points")
         print(f"- Total pts: {total["pts"]} pts ({season_pts_pos} place)")
