@@ -66,7 +66,7 @@ def match_args(args: argparse.Namespace):
 
         case "calendar":
             calendar = Calendar(args.year, f1db)
-            calendar.calendar()
+            calendar.calendar(args.full)
 
         case "race":
             race = Race(args.id, args.year, f1db, table, args.full)
@@ -159,7 +159,8 @@ def main():
     champ_p.add_argument      ("--flags", action="store_true", help="Add emoji flags to grand prix columns")
 
     calendar_p = subps.add_parser("calendar", help="Dates/calendar for a given season")
-    calendar_p.add_argument      ("year", metavar="YEAR", type=str, help="Season year")
+    calendar_p.add_argument      ("year",     metavar="YEAR", type=str, help="Season year")
+    calendar_p.add_argument      ("-f", "--full", action="store_true",  help="Show full calendar, do not stop at current stage")
 
     db_p = subps.add_parser("db",  help="Different database related commands")
     db_p.add_argument      ("-s",  "--sql",          type=str,              help="Run arbitrary sql on the f1db")

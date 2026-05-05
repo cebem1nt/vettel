@@ -838,12 +838,12 @@ class Calendar:
     def __init__(
         self,
         year: int,
-        db_handler: F1DB
+        db_handler: F1DB,
     ):
         self.year = year
         self.db = db_handler
 
-    def calendar(self):
+    def calendar(self, show_full = False):
         fetched = self.db.run_script("calendar", [self.year])
         
         today = datetime.today()
@@ -882,5 +882,9 @@ class Calendar:
 
             print(f"  - Qualifying:        {format_time(quali_date)} - {quali_time}")
             print(f"  - Race:              {format_time(race_date)} - {race_time}")
-
             print()
+
+            if not show_full and is_current_stage:
+                print("....".center(separator_width))
+                print()
+                break
