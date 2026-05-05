@@ -115,7 +115,7 @@ def match_args(args: argparse.Namespace):
             print(f"Unknown command: {args.command}")
 
 def main():
-    p = argparse.ArgumentParser(description="Diferrent charts, statistics, records, all time bests of Formula One")
+    p = argparse.ArgumentParser(description="Different info, statistics, records, all time bests of Formula One")
 
     subps = p.add_subparsers(dest="command", help="Available commands")
     p.add_argument("--double-headers", action="store_true", help="Print table headers twice (at the top and bottom)")

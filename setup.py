@@ -2,10 +2,10 @@ from setuptools import setup
 
 setup(
     name="vettel",
-    version="1.0.0",
+    version="1.1.0",
     author="cebem1nt",
     author_email='cebemnt@gmail.com',
-    description="A cli tool to gather different statistics and info from f1db ",
+    description="Get different formula 1 statistics and info",
     packages=["vettel"],
     py_modules=["vet"],
     include_package_data=True,
