@@ -190,7 +190,7 @@ yay -S vettel # Or with any other aur helper like paru
 ```
 
 <details>
-  <summary>From source</summary>
+  <summary><h3>From source:</h3></summary>
 
   ```sh
   git clone https://github.com/cebem1nt/vettel.git

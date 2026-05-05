@@ -109,7 +109,7 @@ def match_args(args: argparse.Namespace):
                     queries.append((args.grand_prix, "grand_prix"))
             
                 for query, table in queries:
-                    db.search(query, table, args.column, args.pattern)
+                    db.search(query, table, args.column, args.as_pattern)
             
         case _:
             print(f"Unknown command: {args.command}")
@@ -170,7 +170,7 @@ def main():
     db_p.add_argument      ("-t",  "--constructor", metavar="PART", type=str,  help="If searching, search for a constructor (team)")
     db_p.add_argument      ("-c",  "--circuit",     metavar="PART", type=str,  help="If searching, search for circuit")
     db_p.add_argument      ("-g",  "--grand-prix",  metavar="PART", type=str,  help="If searching, search for grand prix")
-    db_p.add_argument      ("--pattern",                 action="store_true",  help="If searching, treat part as entire pattern for sql LIKE")
+    db_p.add_argument      ("--as-pattern",              action="store_true",  help="If searching, treat part as entire pattern for sql LIKE")
     db_p.add_argument      ("--column",  type=str,       default="name",       help="If searching, use given colum to match part, defaults to \"name\"")
 
     args = p.parse_args()

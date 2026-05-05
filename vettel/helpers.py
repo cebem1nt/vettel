@@ -1,4 +1,5 @@
 from typing import Any, Callable, Optional
+from datetime import datetime
 
 SUP_F = "\u1DA0"
 SUP_P = "\u1D56"
@@ -45,8 +46,21 @@ def annotate_pf(data: Any, is_pole: bool, is_fastest: bool):
         addif(data, is_pole, SUP_P),
     is_fastest, SUP_F)
     
-def separator():
-    return '-' * 50
+def separator(width=50):
+    return '-' * width
 
 def print_comments(comments: list[str]):
     print('\n'.join(comments), end="\n\n")
+
+def get_today():
+    return datetime.today()
+
+def try_parse_date(
+    date: Optional[str], 
+    format: str = "%Y-%m-%d"
+) -> Optional[datetime]:
+    try:
+        return datetime.strptime(date, "%Y-%m-%d")
+    except TypeError:
+        return None
+    

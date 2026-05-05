@@ -1,13 +1,19 @@
 import sqlite3, os, subprocess, sys
 
-from datetime import datetime
 from typing import Iterable, Optional, Tuple, Any
 from statistics import mean, stdev, median, median_low, median_high, mode
 
 from collections import defaultdict
 from itertools import islice
 
-from vettel.helpers import strsign, annotate_pf, ifnone, separator, print_comments, Streak
+from vettel.helpers import (
+    strsign, annotate_pf,
+    ifnone, separator, 
+    print_comments, try_parse_date,
+    get_today,
+    Streak
+)
+
 from vettel.tables import Table
 from vettel.emoji import gp_flags
 
@@ -846,10 +852,10 @@ class Calendar:
     def calendar(self, show_full = False):
         fetched = self.db.run_script("calendar", [self.year])
         
-        today = datetime.today()
+        today = get_today()
         is_current_found = False
 
-        format_time = lambda t: t.strftime('%b %d')
+        format_time = lambda t: t.strftime('%b %d') if t else "???"
 
         for rnd, gp, race_date, race_time, \
                      sprint_date, sprint_time, \
@@ -857,10 +863,10 @@ class Calendar:
                      sprint_quali_date, sprint_quali_time in fetched:
 
             is_current_stage = False
-            race_date = datetime.strptime(race_date, "%Y-%m-%d")
-            quali_date = datetime.strptime(quali_date, "%Y-%m-%d")
+            race_date = try_parse_date(race_date, "%Y-%m-%d")
+            quali_date = try_parse_date(quali_date, "%Y-%m-%d")
 
-            if (today < race_date) and not is_current_found:
+            if (today < race_date) and (not is_current_found):
                 is_current_stage = True
                 is_current_found = True
 
@@ -871,17 +877,17 @@ class Calendar:
                 round_string = "-*- " + round_string + " -*-"
             
             print(round_string.center(separator_width + 2))
-            print("  " + ('-' * separator_width))
+            print("  " + separator(separator_width))
 
             if sprint_date:
-                sprint_date = datetime.strptime(sprint_date, "%Y-%m-%d")
-                sprint_quali_date = datetime.strptime(sprint_quali_date, "%Y-%m-%d")
+                sprint_date = try_parse_date(sprint_date, "%Y-%m-%d")
+                sprint_quali_date = try_parse_date(sprint_quali_date, "%Y-%m-%d")
 
-                print(f"  - Sprint qualifying: {format_time(sprint_quali_date)} - {sprint_quali_time}")
-                print(f"  - Sprint:            {format_time(sprint_date)} - {sprint_time}")
+                print(f"  - Sprint qualifying: {format_time(sprint_quali_date)} at {sprint_quali_time}")
+                print(f"  - Sprint:            {format_time(sprint_date)} at {sprint_time}")
 
-            print(f"  - Qualifying:        {format_time(quali_date)} - {quali_time}")
-            print(f"  - Race:              {format_time(race_date)} - {race_time}")
+            print(f"  - Qualifying:        {format_time(quali_date)} at {ifnone(quali_time, "???")}")
+            print(f"  - Race:              {format_time(race_date)} at {ifnone(race_time, "???")}")
             print()
 
             if not show_full and is_current_stage:
