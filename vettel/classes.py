@@ -110,7 +110,7 @@ class Base:
     def __init__(
         self,
         db_handler: F1DB,
-        out_table: Table
+        out_table: Optional[Table] = None
     ):
         self.db = db_handler
         self.table = out_table
@@ -121,6 +121,8 @@ class Base:
         params: Iterable[Any], 
         extra_sql: Optional[str] = None
     ) -> bool:
+        if self.table is None:
+            raise ValueError("Table is None")
 
         rows = self.db.run_script(
             script, params, extra_sql
@@ -587,7 +589,7 @@ class Driver(Base):
         print(f"\nSeason overview — {self.id} ({self.year if self.year else "All time"})")
         print("-" * 50)
         print(f"Races: {total["races"]}  Finished: {total["finished"]}  Not finished/started: {not_finished} ",
-              f"(rate: {not_finished_rate:.1%})" if not_finished else '', end="\n\n")
+              f"(rate: {not_finished_rate:.1%})" if not_finished > 0 else '', end="\n\n")
 
         print("Points")
         print(f"- Total pts: {total["pts"]} pts ({season_pts_pos} place)")
@@ -649,18 +651,17 @@ class Driver(Base):
         print(f"- Longest points streak: {pts_streak}" +
               (f"\n  * {longest_pts_streak}" if pts_streak else ''))
 
-class Season:
+class Season(Base):
     def __init__(
         self, 
-        year: int, 
+        year: int,
         add_gp_flags: bool,
-        db_handler: F1DB,
-        out_table: Table
+        db: F1DB,
+        table: Table
     ):
+        super().__init__(db, table)
         self.year = year
         self.add_gp_flags = add_gp_flags
-        self.db = db_handler
-        self.table = out_table
 
     def championship(self, is_constructor=False):
         sql = """
@@ -728,18 +729,17 @@ class Season:
         self.table.headers = ["pos", "name"] + grandprix_cols + ["pts"]
         self.table.flush()
 
-class Circuit:
+class Circuit(Base):
     def __init__(
         self, 
         id: str,
         rows: int,
         is_reversed: bool,
-        db_handler: F1DB,
-        out_table: Table
+        db: F1DB,
+        table: Table
     ):
+        super().__init__(db, table)
         self.id = id
-        self.db = db_handler
-        self.table = out_table
         self.rows = rows
         self.is_reversed = is_reversed
 
@@ -845,10 +845,10 @@ class Calendar:
     def __init__(
         self,
         year: int,
-        db_handler: F1DB,
+        db: F1DB,
     ):
         self.year = year
-        self.db = db_handler
+        self.db = db
 
     def calendar(self, show_full = False):
         fetched = self.db.run_script("calendar", [self.year])
