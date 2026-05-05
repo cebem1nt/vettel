@@ -49,9 +49,95 @@ vet season 2023 --flags >> README.md
 | 21  | Logan Sargeant   | 12     | 16     | 16     | 16     | 20     | 18     | 20     | DNF    | 13     | 11     | 18     | 17     | DNF    | 13     | 14     | DNF    | DNF    | 10     | 16     | 11     | 16     | 16     | 1   |
 | 22  | Nyck de Vries    | 14     | 14     | 15     | DNF    | 18     | 12     | 14     | 18     | 17     | 17     |        |        |        |        |        |        |        |        |        |        |        |        | 0   |
 
-Race results:
+<table><tr>
+<td>
+
 ```sh
-vet race japan 2026 # pass --full to get more info
+vet circuit silverstone --most-wins -r=30
+```
+  
+```
+|    | driver                | total |
+|----|-----------------------|-------|
+| 1  | Lewis Hamilton        | 9     |
+| 2  | Alain Prost           | 5     |
+| 3  | Jim Clark             | 3     |
+| 4  | Michael Schumacher    | 3     |
+| 5  | Nigel Mansell         | 3     |
+| 6  | Alberto Ascari        | 2     |
+| 7  | David Coulthard       | 2     |
+| 8  | Fernando Alonso       | 2     |
+| 9  | Jackie Stewart        | 2     |
+| 10 | Jacques Villeneuve    | 2     |
+| 11 | José Froilán González | 2     |
+| 12 | Mark Webber           | 2     |
+| 13 | Max Verstappen        | 2     |
+| 14 | Sebastian Vettel      | 2     |
+| 15 | Ayrton Senna          | 1     |
+| 16 | Carlos Sainz Jr.      | 1     |
+| 17 | Clay Regazzoni        | 1     |
+| 18 | Damon Hill            | 1     |
+| 19 | Emerson Fittipaldi    | 1     |
+| 20 | Jack Brabham          | 1     |
+| 21 | James Hunt            | 1     |
+| 22 | John Watson           | 1     |
+| 23 | Johnny Herbert        | 1     |
+| 24 | Juan Manuel Fangio    | 1     |
+| 25 | Juan Pablo Montoya    | 1     |
+| 26 | Kimi Räikkönen        | 1     |
+| 27 | Lando Norris          | 1     |
+| 28 | Mika Häkkinen         | 1     |
+| 29 | Nico Rosberg          | 1     |
+| 30 | Nino Farina           | 1     |
+```
+
+</td>
+<td>
+  
+```sh
+vet calendar 2026
+```
+```
+        Round 1 - Australia
+ -----------------------------------
+ - Qualifying:        Mar 07 at 05:00
+ - Race:              Mar 08 at 04:00
+
+          Round 2 - China
+ -----------------------------------
+ - Sprint qualifying: Mar 13 at 07:30
+ - Sprint:            Mar 14 at 03:00
+ - Qualifying:        Mar 14 at 07:00
+ - Race:              Mar 15 at 07:00
+
+         Round 3 - Japan
+ -----------------------------------
+ - Qualifying:        Mar 28 at 06:00
+ - Race:              Mar 29 at 05:00
+
+          Round 4 - Miami
+ -----------------------------------
+ - Sprint qualifying: May 01 at 20:30
+ - Sprint:            May 02 at 16:00
+ - Qualifying:        May 02 at 20:00
+ - Race:              May 03 at 17:00
+
+      -*- Round 5 - Canada -*-
+ -----------------------------------
+ - Sprint qualifying: May 22 at 20:30
+ - Sprint:            May 23 at 16:00
+ - Qualifying:        May 23 at 20:00
+ - Race:              May 24 at 20:00
+
+                ....
+```
+
+</td>
+
+<td>
+
+```sh
+vet race japan 2026
 ```
 ```
   Driver              Finish    Points
@@ -87,68 +173,55 @@ Lance Stroll - Reason retired: Mechanical
 Oliver Bearman - Reason retired: Accident
 ```
 
+</td>
+<td>
+
 ```sh
-# Get 2023 max verstappen overview/statistics:
-vet driver max-verstappen 2023
+vet sprint china 2026 --full
 ```
+
 ```
-Season overview — max-verstappen (2023)
+| driver            | constructor  | start | finish  | gap     | laps | penalty | pts |
+|-------------------|--------------|-------|---------|---------|------|---------|-----|
+| George Russell    | Mercedes     | 1     | 1       |         | 19   |         | 8   |
+| Charles Leclerc   | Ferrari      | 6     | 2 (+4)  | +0.674  | 19   |         | 7   |
+| Lewis Hamilton    | Ferrari      | 4     | 3 (+1)  | +2.554  | 19   |         | 6   |
+| Lando Norris      | McLaren      | 3     | 4 (-1)  | +4.433  | 19   |         | 5   |
+| Kimi Antonelli    | Mercedes     | 2     | 5 (-3)  | +5.688  | 19   |         | 4   |
+| Oscar Piastri     | McLaren      | 5     | 6 (-1)  | +6.809  | 19   |         | 3   |
+| Liam Lawson       | Racing Bulls | 13    | 7 (+6)  | +10.900 | 19   |         | 2   |
+| Oliver Bearman    | Haas         | 9     | 8 (+1)  | +11.271 | 19   |         | 1   |
+| Max Verstappen    | Red Bull     | 8     | 9 (-1)  | +11.619 | 19   |         |     |
+| Esteban Ocon      | Haas         | 12    | 10 (+2) | +13.887 | 19   |         |     |
+| Pierre Gasly      | Alpine       | 7     | 11 (-4) | +14.780 | 19   |         |     |
+| Carlos Sainz Jr.  | Williams     | 17    | 12 (+5) | +15.753 | 19   |         |     |
+| Gabriel Bortoleto | Audi         | 14    | 13 (+1) | +15.858 | 19   |         |     |
+| Franco Colapinto  | Alpine       | 16    | 14 (+2) | +16.393 | 19   |         |     |
+| Isack Hadjar      | Red Bull     | 10    | 15 (-5) | +16.430 | 19   |         |     |
+| Alexander Albon   | Williams     | 22    | 16 (+6) | +20.014 | 19   |         |     |
+| Fernando Alonso   | Aston Martin | 18    | 17 (+1) | +21.599 | 19   |         |     |
+| Lance Stroll      | Aston Martin | 19    | 18 (+1) | +21.971 | 19   |         |     |
+| Sergio Pérez      | Cadillac     | 21    | 19 (+2) | +28.241 | 19   | 5.000   |     |
+| Nico Hülkenberg   | Audi         | 11    | DNF     |         | 12   |         |     |
+| Valtteri Bottas   | Cadillac     | 20    | DNF     |         | 12   |         |     |
+| Arvid Lindblad    | Racing Bulls | 15    | DNF     |         | 11   |         |     |
+
+Pole position: George Russell
+
 --------------------------------------------------
-Races: 22  Finished: 22  Not finished/started: 0  (rate: 0.0%)
-
-Points
-- Total pts: 575 pts (1 place)
-- Team pts share: 66.86%
-- Pts per race: 26.14 pts
-- Avg pts when scoring: 26.14 pts
-- Points volatility (std): 3.78 pts
-
-Qualifying & starts
-- Poles: 12  (Pole rate: 54.5%)
-- Q1, Q2 eliminations: 3 (rate: 13.6%)
-- Q3 appearances: 19
-- Pole conversion (poles / Q3s): 63.2%
-- Avg grid position: 3.18
-- Median grid position: 1.00
-- Most common grid position: 1
-- Penalties: 0
-
-Results & rates
-- Wins: 19  (Win rate: 86.4%)
-- Podiums: 21  (Podium rate: 95.5%)
-- Scoring finishes: 22  (Scoring rate: 100.0%)
-- Fastest laps: 9  (Fastest-lap rate: 40.9%)
-- Finish rate: 100.0%
-- Avg finish position: 1.27
-- Median finish position: 1.00
-- Most common finish position: 1
-- Finish position CV (coefficient of variation): 0.694
-
-Pit stops & strategy
-- Avg pit stops per race: 2.18
-- Avg pit stops time: 22.97s
-- Problematic pit stops: 6
-
-Not started/finished/classified, disqualified:
-- DNF: 0 (0.0%)
-- DNS: 0 (0.0%)
-- DSQ: 0 (0.0%)
-- NC: 0 (0.0%)
-
-Race progress
-- Avg positions gained per race: 4.67
-- Races net gain: 40.9%
-- Races net loss: 0.0%
-- Races no change: 59.1%
-- Longest podium streak: 14
-  * (2023, 'bahrain') ... (2023, 'italy')
-- Longest win streak: 10
-  * (2023, 'miami') ... (2023, 'italy')
-- Longest points streak: 22
-  * (2023, 'bahrain') ... (2023, 'abu-dhabi')
+Nico Hülkenberg - Reason retired: Mechanical
+Valtteri Bottas - Reason retired: Withdrew
+Arvid Lindblad - Reason retired: Collision damage
 ```
+
+</td>
+</tr></table>
 
 Other:
+```sh
+# Get 2023 max verstappen comprehensive overview/statistics:
+vet driver max-verstappen 2023
+```
 ```sh
 # Get 2023 max verstappen race results table:
 vet driver max-verstappen 2023 --races
@@ -213,10 +286,9 @@ vet db --update
 ## Misc
 
 ```
-usage: vet [-h] [--double-headers] [--no-delimiters] [--adjustment {left,center,right}]
-           {circuit,driver,race,sprint,season,calendar,db} ...
+usage: vet [-h] [--double-headers] [--no-delimiters] [--adjustment {left,center,right}] {circuit,driver,race,sprint,season,calendar,db} ...
 
-Diferrent charts, statistics, records, all time bests of Formula One
+Different info, statistics, records, all time bests of Formula One
 
 positional arguments:
   {circuit,driver,race,sprint,season,calendar,db}
