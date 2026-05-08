@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name="vettel",
-    version="1.1.0",
+    version="1.1.1",
     author="cebem1nt",
     author_email='cebemnt@gmail.com',
     description="Get different formula 1 statistics and info",
