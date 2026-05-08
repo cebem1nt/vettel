@@ -270,12 +270,12 @@ yay -S vettel # Or with any other aur helper like paru
   cd vettel
   ```
 
-  ### Using pip
+  #### Using pip
   ```sh
   pip install .
   ```
 
-  ### Using old setup.py
+  #### Using old setup.py
   ```sh
   sudo python setup.py install --optimize=1
   ```
