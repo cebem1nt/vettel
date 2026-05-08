@@ -270,14 +270,19 @@ yay -S vettel # Or with any other aur helper like paru
   cd vettel
   ```
 
+  ### Using pip
   ```sh
-  # Install systemwide with python
+  pip install .
+  ```
+
+  ### Using old setup.py
+  ```sh
   sudo python setup.py install --optimize=1
   ```
 
 </details>
 
-To get new info, update [f1db](https://github.com/f1db/f1db) once in a while with:
+To get new info, update database once in a while with:
 
 ```sh
 vet db --update
