@@ -1,7 +1,9 @@
-import sqlite3, os, subprocess, sys
+import sqlite3, os, sys
 
 from typing import Iterable, Optional, Tuple, Any
 from statistics import mean, stdev, median, median_low, median_high, mode
+from urllib.request import urlopen
+from zipfile import ZipFile
 
 from collections import defaultdict
 from itertools import islice
@@ -80,23 +82,24 @@ class F1DB:
             os.remove(self.db_file) 
 
         zip_file = "f1db-sqlite.zip"
+        print(f"Downloading database: {DB_SOURCE}...")
 
-        print(f"Clonning database: {DB_SOURCE}...")
-        wget_proc = subprocess.run(["wget", DB_SOURCE], check=True, 
-            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        try:
+            with urlopen(DB_SOURCE) as remote, open(zip_file, "wb") as local:
+                local.write(remote.read())
 
-        if wget_proc.returncode != 0:
-            sys.stderr.write("Could not clone, perhaps wget is not installed?\n")
-            exit(1)
+        except Exception as e:
+            sys.stderr.write(f"Error while downloading: {e}\n")
 
         print(f"Extracting {zip_file}...")
-        unzip_proc = subprocess.run(["unzip", zip_file], check=True)
 
-        if unzip_proc.returncode != 0:
-            sys.stderr.write("Could not unzip, perhaps unzip is not installed?\n")
-            exit(1)
+        try:
+            with ZipFile(zip_file) as z:
+                z.extractall()
+        except Exception as e:
+            sys.stderr.write(f"Error while extracting: {e}\n")
 
-        print("Database was clonned successfully!")
+        print("Database was installed successfully!")
         os.remove(zip_file)
 
     def execute(self, sql: str, params: Optional[Iterable]) -> list[Any]:
