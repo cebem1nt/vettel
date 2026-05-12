@@ -11,7 +11,8 @@ from vettel.classes import (
     Season,
     Circuit,
     Calendar,
-    Standings
+    Standings,
+    Results
 )
 
 VERSION = "1.2.0"
@@ -48,6 +49,10 @@ def match_args(args: argparse.Namespace):
         case "standings":
             standings = Standings(args.year, f1db, table)
             standings.standings(args.constructor)
+
+        case "results":
+            results = Results(args.year, f1db, table)
+            results.results()
 
         case "season":
             season = Season(args.year, args.flags, f1db, table)
@@ -161,9 +166,12 @@ def main():
     sprint_p.add_argument      ("-f", "--full",         action="store_true",  help="Show full information table")
     sprint_p.add_argument      ("-q", "--qualifying",   action="store_true",  help="Show the qualifying result instead")
 
-    standings_p = subps.add_parser("standings", help="Get season driver standings")
+    standings_p = subps.add_parser("standings", help="Season driver standings")
     standings_p.add_argument      ("year", metavar="YEAR", type=str, nargs="?",  help="Season year. Current year if omitted")
     standings_p.add_argument      ("-c", "--constructor",  action="store_true",  help="Show constructor standings instead")
+
+    results_p = subps.add_parser("results", help="Season races results")
+    results_p.add_argument      ("year", metavar="YEAR", type=str, nargs="?",  help="Season year. Current year if omitted")
 
     season_p = subps.add_parser("season", help="Fancy wikipedia like season table for driver/constructor championship")
     season_p.add_argument      ("year", metavar="YEAR", type=str, nargs="?", help="Season year. Current year if omitted")
@@ -174,16 +182,16 @@ def main():
     calendar_p.add_argument      ("year", metavar="YEAR", type=str, nargs="?", help="Season year. Current year if omitted")
     calendar_p.add_argument      ("-f", "--full", action="store_true",         help="Show full calendar, do not stop at current stage")
 
-    db_p = subps.add_parser("db",  help="Different database related commands")
-    db_p.add_argument      ("-s",  "--sql",              type=str,             help="Run arbitrary sql script on the f1db")
-    db_p.add_argument      ("-u",  "--update", "--init", action="store_true",  help="Update/init f1db")
-    db_p.add_argument      ("-S",  "--search",           action="store_true",  help="Enable search mode. Provide additional -d/t/c/g with part to search for")
-    db_p.add_argument      ("-d",  "--driver",      metavar="PART", type=str,  help="If searching, search for driver")
-    db_p.add_argument      ("-t",  "--constructor", metavar="PART", type=str,  help="If searching, search for a constructor (team)")
-    db_p.add_argument      ("-c",  "--circuit",     metavar="PART", type=str,  help="If searching, search for circuit")
-    db_p.add_argument      ("-g",  "--grand-prix",  metavar="PART", type=str,  help="If searching, search for grand prix")
-    db_p.add_argument      ("--as-pattern",              action="store_true",  help="If searching, treat part as entire pattern for sql LIKE")
-    db_p.add_argument      ("--column",  type=str,       default="name",       help="If searching, use given colum to match part, defaults to \"name\"")
+    db_p = subps.add_parser("db", help="Different database related commands")
+    db_p.add_argument      ("-s", "--sql",              type=str,             help="Run arbitrary sql script on the f1db")
+    db_p.add_argument      ("-u", "--update", "--init", action="store_true",  help="Update/init f1db")
+    db_p.add_argument      ("-S", "--search",           action="store_true",  help="Enable search mode. Provide additional -d/t/c/g with part to search for")
+    db_p.add_argument      ("-d", "--driver",      metavar="PART", type=str,  help="If searching, search for driver")
+    db_p.add_argument      ("-t", "--constructor", metavar="PART", type=str,  help="If searching, search for a constructor (team)")
+    db_p.add_argument      ("-c", "--circuit",     metavar="PART", type=str,  help="If searching, search for circuit")
+    db_p.add_argument      ("-g", "--grand-prix",  metavar="PART", type=str,  help="If searching, search for grand prix")
+    db_p.add_argument      ("--as-pattern",              action="store_true", help="If searching, treat part as entire pattern for sql LIKE")
+    db_p.add_argument      ("--column",  type=str,       default="name",      help="If searching, use given colum to match part, defaults to \"name\"")
 
     args = p.parse_args()
 

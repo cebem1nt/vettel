@@ -122,7 +122,8 @@ class Base:
         self, 
         script: str, 
         params: Iterable[Any], 
-        extra_sql: Optional[str] = None
+        extra_sql: Optional[str] = None,
+        auto_headers: bool = True
     ) -> bool:
         if self.table is None:
             raise ValueError("Table is None")
@@ -135,7 +136,10 @@ class Base:
             return False
 
         self.table.rows = rows
-        self.table.headers = self.db.get_columns()
+        
+        if auto_headers:
+            self.table.headers = self.db.get_columns()
+        
         self.table.flush()
         return True
 
@@ -939,4 +943,33 @@ class Standings(Base):
 
             self.table.rows.append(row)
 
+        self.table.flush()
+
+class Results(Base):
+    def __init__(
+        self,
+        year: Optional[int],
+        db: F1DB,
+        table: Table,
+    ):
+        super().__init__(db, table)
+
+        self.year = year
+        if not self.year:
+            self.year = get_current_year()
+
+        self.table.hide_delimiters = True
+
+    def results(self):
+        self.table.headers = ["Grand Prix", "GP Date", "Winner", "Constructor", "Laps", "Finish Time"]
+        format_time = lambda t: t.strftime('%b %d') if t else "???"
+
+        rows = self.db.run_script("results", [self.year])
+
+        for row in rows:
+            row = list(row)
+            parsed_gp_date = try_parse_date(row[1])
+            row[1] = format_time(parsed_gp_date)
+            self.table.rows.append(row)
+        
         self.table.flush()
