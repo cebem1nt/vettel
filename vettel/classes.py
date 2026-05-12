@@ -158,7 +158,7 @@ class Race(Base):
 
     def race(self):
         rows = self.db.run_script(
-            "race", {"id": self.id, "year": self.year}
+            "race/race", {"id": self.id, "year": self.year}
         )
 
         if not rows:
@@ -210,8 +210,8 @@ class Race(Base):
             print_comments(dnf_comments)
 
     def qualifying(self):
-        script = "race-qualifying" if self.is_full else \
-                 "race-qualifying-small"
+        script = "race/qualifying" if self.is_full else \
+                 "race/qualifying-small"
 
         if not self.flush_script(script, {"id": self.id, "year": self.year}):
             print(f"No race qualifying found: {self.id} - {self.year}")
@@ -235,7 +235,7 @@ class Sprint(Base):
 
     def sprint(self):
         rows = self.db.run_script(
-            "sprint", {"id": self.id, "year": self.year}
+            "sprint/sprint", {"id": self.id, "year": self.year}
         )
 
         if not rows:
@@ -273,8 +273,8 @@ class Sprint(Base):
             print_comments(dnf_comments)
 
     def qualifying(self):
-        script = "sprint-qualifying" if self.is_full else \
-                 "sprint-qualifying-small"
+        script = "sprint/qualifying" if self.is_full else \
+                 "sprint/qualifying-small"
 
         if not self.flush_script(script, {"id": self.id, "year": self.year}):
             print(f"No sprint qualifying found: {self.id} - {self.year}")
@@ -294,12 +294,12 @@ class Driver(Base):
     def races(self):
         if not self.year:
             rows = self.db.run_script(
-                "driver-races", 
+                "driver/races", 
                 params={"id": self.id}
             )
         else:
             rows = self.db.run_script(
-                "driver-races",
+                "driver/races",
                 extra_sql="and race.year = :year",
                 params={"id": self.id, "year": self.year} 
             )
@@ -342,12 +342,12 @@ class Driver(Base):
     def pits(self):
         if not self.year:
             rows = self.db.run_script(
-                "driver-pits", 
+                "driver/pits", 
                 params={"id": self.id}
             )
         else:
             rows = self.db.run_script(
-                "driver-pits",
+                "driver/pits",
                 extra_sql="and race.year = :year",
                 params={"id": self.id, "year": self.year} 
             )
@@ -389,25 +389,25 @@ class Driver(Base):
 
     def qualifying(self):
         if self.year:
-            self.flush_script("driver-qualifying", {"id": self.id, "year": self.year}, extra_sql="and race.year = :year")
+            self.flush_script("driver/qualifying", {"id": self.id, "year": self.year}, extra_sql="and race.year = :year")
         else:
-            self.flush_script("driver-qualifying", {"id": self.id} )
+            self.flush_script("driver/qualifying", {"id": self.id} )
 
     def sprints(self):
         if self.year:
-            self.flush_script("driver-sprints", {"id": self.id, "year": self.year}, extra_sql="and race.year = :year")
+            self.flush_script("driver/sprints", {"id": self.id, "year": self.year}, extra_sql="and race.year = :year")
         else:
-            self.flush_script("driver-sprints", {"id": self.id} )
+            self.flush_script("driver/sprints", {"id": self.id} )
 
     def overview(self):
         if not self.year:
             rows = self.db.run_script(
-                "driver-season-overview", 
+                "driver/overview", 
                 params={"id": self.id}
             )
         else:
             rows = self.db.run_script(
-                "driver-season-overview",
+                "driver/overview",
                 extra_sql="and r.year = :year",
                 params={"id": self.id, "year": self.year} 
             )
@@ -595,7 +595,7 @@ class Driver(Base):
               f"(rate: {not_finished_rate:.1%})" if not_finished > 0 else '', end="\n\n")
 
         print("Points")
-        print(f"- Total pts: {total["pts"]} pts ({season_pts_pos} place)")
+        print(f"- Total pts: {total["pts"]} pts { f"({season_pts_pos} place)" if self.year else '' }")
         print(f"- Team pts share: {points_share:.2%}")
         print(f"- Pts per race: {pts_per_race:.2f} pts")
         print(f"- Avg pts when scoring: {avg_points_when_scoring:.2f} pts")
@@ -667,7 +667,7 @@ class Season(Base):
         self.add_gp_flags = add_gp_flags
 
     def championship(self, is_constructor=False):
-        sql = """
+        gp_info_sql = """
             SELECT 
                 grand_prix.id, 
                 grand_prix.abbreviation 
@@ -676,7 +676,7 @@ class Season(Base):
             WHERE race.grand_prix_id = grand_prix.id
         """
 
-        rows = self.db.execute(sql, [self.year])
+        rows = self.db.execute(gp_info_sql, [self.year])
 
         grandprix_cols = []
         grandprix_template = {}
@@ -691,7 +691,7 @@ class Season(Base):
             grandprix_cols.append(abbr)
             grandprix_template[abbr] = None
 
-        rows = self.db.run_script("championship", {"year": self.year})
+        rows = self.db.run_script("season", {"year": self.year})
 
         drivers_results = defaultdict(lambda: dict(grandprix_template))
         teams_drivers = defaultdict(dict)
@@ -750,7 +750,7 @@ class Circuit(Base):
         self, 
         script: str
     ):
-        fetched = self.db.run_script(script, [self.id])
+        fetched = self.db.run_script(os.path.join("circuit", script), [self.id])
         if self.rows != -1:
             fetched = fetched[:self.rows]
 
@@ -915,7 +915,7 @@ class Standings(Base):
         self.table.hide_delimiters = True
 
     def standings(self, is_constructor=False):
-        script = "standings-constructor" if is_constructor else "standings"
+        script = "standings/constructor" if is_constructor else "standings/standings"
         rows = self.db.run_script(script, [self.year])
 
         self.table.headers = ["", "Name", "Points"]
