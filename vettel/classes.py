@@ -153,6 +153,9 @@ class Race(Base):
         self.year = year
         self.is_full = is_full
 
+        if not self.year:
+            self.year = get_current_year()
+
         if not self.is_full:
             self.table.hide_delimiters = True
 
@@ -229,6 +232,9 @@ class Sprint(Base):
         self.id = id
         self.year = year
         self.is_full = is_full
+
+        if not self.year:
+            self.year = get_current_year()
 
         if not self.is_full:
             self.table.hide_delimiters = True
@@ -664,6 +670,9 @@ class Season(Base):
     ):
         super().__init__(db, table)
         self.year = year
+        if not self.year:
+            self.year = get_current_year()
+
         self.add_gp_flags = add_gp_flags
 
     def championship(self, is_constructor=False):
@@ -851,6 +860,9 @@ class Calendar:
         db: F1DB,
     ):
         self.year = year
+        if not self.year:
+            self.year = get_current_year()
+
         self.db = db
 
     def calendar(self, show_full = False):
@@ -915,9 +927,10 @@ class Standings(Base):
         self.table.hide_delimiters = True
 
     def standings(self, is_constructor=False):
-        script = "standings/constructor" if is_constructor else "standings/standings"
+        script = "standings/constructor" if is_constructor else \
+                 "standings/standings"
+        
         rows = self.db.run_script(script, [self.year])
-
         self.table.headers = ["", "Name", "Points"]
 
         for is_winner, *row in rows:
