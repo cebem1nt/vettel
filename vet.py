@@ -10,7 +10,8 @@ from vettel.classes import (
     Driver, 
     Season,
     Circuit,
-    Calendar
+    Calendar,
+    Standings
 )
 
 VERSION = "1.2.0"
@@ -44,6 +45,10 @@ def match_args(args: argparse.Namespace):
             if args.most_podiums:
                 circuit.record("most-podiums")
         
+        case "standings":
+            standings = Standings(args.year, f1db, table)
+            standings.standings(args.constructor)
+
         case "season":
             season = Season(args.year, args.flags, f1db, table)
             season.championship(args.constructor)
@@ -156,10 +161,14 @@ def main():
     sprint_p.add_argument      ("-f", "--full",         action="store_true",  help="Show full information table")
     sprint_p.add_argument      ("-q", "--qualifying",   action="store_true",  help="Show the qualifying result instead")
 
-    champ_p = subps.add_parser("season", help="Fancy wikipedia like season table for driver/constructor championship")
-    champ_p.add_argument      ("year", metavar="YEAR", type=str, help="Season year")
-    champ_p.add_argument      ("-c", "--constructor", action="store_true", help="Show constructor standing instead of driver")
-    champ_p.add_argument      ("--flags", action="store_true", help="Add emoji flags to grand prix columns")
+    standings_p = subps.add_parser("standings", help="Get season driver standings")
+    standings_p.add_argument      ("year", metavar="YEAR", type=str, nargs="?", help="Season year. Current year if omitted")
+    standings_p.add_argument      ("-c", "--constructor", action="store_true",  help="Show constructor standings instead")
+
+    season_p = subps.add_parser("season", help="Fancy wikipedia like season table for driver/constructor championship")
+    season_p.add_argument      ("year", metavar="YEAR", type=str,           help="Season year")
+    season_p.add_argument      ("-c", "--constructor", action="store_true", help="Show constructor table instead")
+    season_p.add_argument      ("--flags", action="store_true",             help="Add emoji flags to grand prix columns")
 
     calendar_p = subps.add_parser("calendar", help="Dates/calendar for a given season")
     calendar_p.add_argument      ("year",     metavar="YEAR", type=str, help="Season year")

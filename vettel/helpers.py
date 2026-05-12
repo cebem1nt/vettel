@@ -55,6 +55,9 @@ def print_comments(comments: list[str]):
 def get_today():
     return datetime.today()
 
+def get_current_year():
+    return datetime.now().year
+
 def try_parse_date(
     date: Optional[str], 
     format: str = "%Y-%m-%d"

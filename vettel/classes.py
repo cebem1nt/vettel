@@ -12,7 +12,7 @@ from vettel.helpers import (
     strsign, annotate_pf,
     ifnone, separator, 
     print_comments, try_parse_date,
-    get_today,
+    get_today, get_current_year,
     Streak
 )
 
@@ -898,3 +898,32 @@ class Calendar:
                 print("....".center(separator_width))
                 print()
                 break
+
+class Standings(Base):
+    def __init__(
+        self,
+        year: Optional[int],
+        db: F1DB,
+        table: Table,
+    ):
+        super().__init__(db, table)
+
+        self.year = year
+        if not self.year:
+            self.year = get_current_year()
+
+        self.table.hide_delimiters = True
+
+    def standings(self, is_constructor=False):
+        script = "standings-constructor" if is_constructor else "standings"
+        rows = self.db.run_script(script, [self.year])
+
+        self.table.headers = ["", "Name", "Points"]
+
+        for is_winner, *row in rows:
+            if is_winner:
+                row[1] = f"♔ {row[1]}" # "👑" messes alignment
+
+            self.table.rows.append(row)
+
+        self.table.flush()
