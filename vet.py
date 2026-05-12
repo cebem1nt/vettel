@@ -13,6 +13,8 @@ from vettel.classes import (
     Calendar
 )
 
+VERSION = "1.2.0"
+
 def match_args(args: argparse.Namespace):
     table = Table(
         args.adjustment,
@@ -121,6 +123,7 @@ def main():
     p.add_argument("--double-headers", action="store_true", help="Print table headers twice (at the top and bottom)")
     p.add_argument("--no-delimiters", action="store_true", help="Do not print any separators for tables")
     p.add_argument("--adjustment", default="left", choices=("left", "center", "right"), help="Table text alignment")
+    p.add_argument("--version", action="store_true", help="Show vettel version and exit")
 
     circuit_p = subps.add_parser("circuit", help="Get different records for a circuit")
     circuit_p.add_argument      ("id",  metavar="ID", type=str,                   help="Circuit id")
@@ -175,7 +178,9 @@ def main():
 
     args = p.parse_args()
 
-    if any(vars(args).values()) and args.command:
+    if args.version:
+        print('v'+VERSION)
+    elif any(vars(args).values()) and args.command:
         match_args(args)
     else:
         p.print_help()

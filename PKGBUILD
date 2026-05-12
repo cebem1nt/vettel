@@ -1,7 +1,7 @@
 # Maintainer: cebem1nt <cebem1nt@gmail.com>
 
 pkgname=vettel
-pkgver=1.1.1
+pkgver=1.2.0
 pkgrel=1
 pkgdesc='Get different formula 1 statistics and info'
 arch=('any')

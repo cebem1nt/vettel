@@ -1,8 +1,9 @@
 from setuptools import setup
+from vet import VERSION
 
 setup(
     name="vettel",
-    version="1.1.1",
+    version=VERSION,
     author="cebem1nt",
     author_email='cebemnt@gmail.com',
     description="Get different formula 1 statistics and info",
