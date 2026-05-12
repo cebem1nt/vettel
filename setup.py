@@ -10,7 +10,12 @@ setup(
     packages=["vettel"],
     py_modules=["vet"],
     include_package_data=True,
-    package_data={"vettel": ["sql/*.sql"]},
+    package_data={ 
+        "vettel": [
+            "sql/*", 
+            "sql/*/*.sql"
+        ]
+    },
     entry_points={
         "console_scripts": [
             "vet=vet:main"
