@@ -11,9 +11,10 @@ from itertools import islice
 from vettel.helpers import (
     strsign, annotate_pf,
     ifnone, separator, 
-    print_comments, try_parse_date,
-    get_today, get_current_year,
-    Streak
+    print_comments, parse_datetime,
+    get_now, get_current_year,
+    parse_utc_time_to_local,
+    format_datetime, Streak
 )
 
 from vettel.tables import Table
@@ -872,10 +873,9 @@ class Calendar:
     def calendar(self, show_full = False):
         fetched = self.db.run_script("calendar", [self.year])
         
-        today = get_today()
+        now = get_now()
         is_current_found = False
-
-        format_time = lambda t: t.strftime('%b %d') if t else "???"
+        separator_width = 35
 
         for rnd, gp, race_date, race_time, \
                      sprint_date, sprint_time, \
@@ -883,14 +883,17 @@ class Calendar:
                      sprint_quali_date, sprint_quali_time in fetched:
 
             is_current_stage = False
-            race_date = try_parse_date(race_date, "%Y-%m-%d")
-            quali_date = try_parse_date(quali_date, "%Y-%m-%d")
 
-            if (today < race_date) and (not is_current_found):
+            if race_time:
+                race_datetime = parse_datetime(race_date + ' ' + race_time, "%Y-%m-%d %H:%M")
+            else:
+                race_datetime = parse_datetime(race_date, "%Y-%m-%d")
+
+            quali_datetime = parse_datetime(quali_date, "%Y-%m-%d")
+
+            if (now < race_datetime) and (not is_current_found):
                 is_current_stage = True
                 is_current_found = True
-
-            separator_width = 35
 
             round_string = f"Round {rnd} - {gp}"
             if is_current_stage:
@@ -900,14 +903,14 @@ class Calendar:
             print("  " + separator(separator_width))
 
             if sprint_date:
-                sprint_date = try_parse_date(sprint_date, "%Y-%m-%d")
-                sprint_quali_date = try_parse_date(sprint_quali_date, "%Y-%m-%d")
+                sprint_datetime = parse_datetime(sprint_date, "%Y-%m-%d")
+                sprint_quali_datetime = parse_datetime(sprint_quali_date, "%Y-%m-%d")
 
-                print(f"  - Sprint qualifying: {format_time(sprint_quali_date)} at {sprint_quali_time}")
-                print(f"  - Sprint:            {format_time(sprint_date)} at {sprint_time}")
+                print(f"  - Sprint qualifying: {format_datetime(sprint_quali_datetime)} at {parse_utc_time_to_local(sprint_quali_time)}")
+                print(f"  - Sprint:            {format_datetime(sprint_datetime)} at {parse_utc_time_to_local(sprint_time)}")
 
-            print(f"  - Qualifying:        {format_time(quali_date)} at {ifnone(quali_time, "???")}")
-            print(f"  - Race:              {format_time(race_date)} at {ifnone(race_time, "???")}")
+            print(f"  - Qualifying:        {format_datetime(quali_datetime)} at {parse_utc_time_to_local(quali_time)}")
+            print(f"  - Race:              {format_datetime(race_datetime)} at {parse_utc_time_to_local(race_time)}")
             print()
 
             if not show_full and is_current_stage:
@@ -962,14 +965,12 @@ class Results(Base):
 
     def results(self):
         self.table.headers = ["Grand Prix", "GP Date", "Winner", "Constructor", "Laps", "Finish Time"]
-        format_time = lambda t: t.strftime('%b %d') if t else "???"
-
         rows = self.db.run_script("results", [self.year])
 
         for row in rows:
             row = list(row)
             parsed_gp_date = try_parse_date(row[1])
-            row[1] = format_time(parsed_gp_date)
+            row[1] = format_datetime(parsed_gp_date)
             self.table.rows.append(row)
         
         self.table.flush()

@@ -1,5 +1,6 @@
 from typing import Any, Callable, Optional
-from datetime import datetime
+from datetime import datetime, timezone
+from zoneinfo import ZoneInfo
 
 SUP_F = "\u1DA0"
 SUP_P = "\u1D56"
@@ -52,18 +53,34 @@ def separator(width=50):
 def print_comments(comments: list[str]):
     print('\n'.join(comments), end="\n\n")
 
-def get_today():
-    return datetime.today()
+def get_now():
+    return datetime.now().astimezone(timezone.utc)
 
 def get_current_year():
     return datetime.now().year
 
-def try_parse_date(
+def parse_utc_time_to_local(
     date: Optional[str], 
-    format: str = "%Y-%m-%d"
+    format: str = "%H:%M"
+) -> str:
+    if date is None:
+        return "???"
+
+    raw = datetime.strptime(date, format)
+    intermediate = datetime.combine(get_now(), raw.time(), tzinfo=timezone.utc)
+    local = intermediate.astimezone()
+    return local.strftime(format)
+
+def format_datetime(
+    date: Optional[datetime],
+    format: str = "%b %d",
+) -> str:
+    return date.strftime(format) if date else "???"
+
+def parse_datetime(
+    date: Optional[str], 
+    format: str = "%Y-%m-%d",
 ) -> Optional[datetime]:
-    try:
-        return datetime.strptime(date, "%Y-%m-%d")
-    except TypeError:
+    if date is None:
         return None
-    
+    return datetime.strptime(date, format).astimezone(timezone.utc)
