@@ -1,6 +1,5 @@
 from typing import Any, Callable, Optional
 from datetime import datetime, timezone
-from zoneinfo import ZoneInfo
 
 SUP_F = "\u1DA0"
 SUP_P = "\u1D56"
@@ -54,7 +53,7 @@ def print_comments(comments: list[str]):
     print('\n'.join(comments), end="\n\n")
 
 def get_now():
-    return datetime.now().astimezone(timezone.utc)
+    return datetime.now()
 
 def get_current_year():
     return datetime.now().year
@@ -83,4 +82,4 @@ def parse_datetime(
 ) -> Optional[datetime]:
     if date is None:
         return None
-    return datetime.strptime(date, format).astimezone(timezone.utc)
+    return datetime.strptime(date, format)

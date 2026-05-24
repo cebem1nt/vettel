@@ -883,12 +883,7 @@ class Calendar:
                      sprint_quali_date, sprint_quali_time in fetched:
 
             is_current_stage = False
-
-            if race_time:
-                race_datetime = parse_datetime(race_date + ' ' + race_time, "%Y-%m-%d %H:%M")
-            else:
-                race_datetime = parse_datetime(race_date, "%Y-%m-%d")
-
+            race_datetime = parse_datetime(race_date, "%Y-%m-%d")
             quali_datetime = parse_datetime(quali_date, "%Y-%m-%d")
 
             if (now < race_datetime) and (not is_current_found):
