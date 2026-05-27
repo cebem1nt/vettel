@@ -33,6 +33,10 @@ class Streak:
         return max(self.longest, self.current, key=len)
 
 class Date:
+    """
+    Class to manage UTC dates.
+    Takes in ISO formatted dates, times
+    """
     def __init__(
         self, 
         date: Optional[str],
@@ -57,17 +61,23 @@ class Date:
 
         self._combined = datetime.combine(com_date, com_time, tz.utc)
 
-    def date(self, fmt: str = "%b %d") -> str:
+    def date(self, fmt: str = "%b %d", as_local = True) -> str:
         if self._date is None:
             return "???"
 
-        return datetime.strftime(self._combined.astimezone(), fmt)
+        interm = self._combined.astimezone() if as_local else \
+                 self._combined
 
-    def time(self, fmt: str = "%H:%M") -> str:
+        return datetime.strftime(interm, fmt)
+
+    def time(self, fmt: str = "%H:%M", as_local = True) -> str:
         if self._time is None:
             return "???"
+        
+        interm = self._combined.astimezone() if as_local else \
+                 self._combined
 
-        return datetime.strftime(self._combined.astimezone(), fmt)
+        return datetime.strftime(interm, fmt)
 
     def year(self) -> int:
         return self._combined.year

@@ -868,12 +868,18 @@ class Calendar:
 
         self.db = db
 
-    def calendar(self, show_full = False):
+    def calendar(self, show_full = False, is_utc = False):
         fetched = self.db.run_script("calendar", [self.year])
         
         today = Date("today") 
         is_current_found = False
         separator_width = 35
+
+        time_fmt = "%H:%M"
+        if is_utc:
+            time_fmt += " %Z"
+
+        as_local = not is_utc
 
         for rnd, gp, race_date, race_time, \
                      sprint_date, sprint_time, \
@@ -881,7 +887,7 @@ class Calendar:
                      sprint_quali_date, sprint_quali_time in fetched:
 
             is_current_stage = False
-    
+
             race = Date(race_date, race_time)
             quali = Date(quali_date, quali_time)
 
@@ -900,11 +906,11 @@ class Calendar:
                 sprint = Date(sprint_date, sprint_time)
                 sprint_quali = Date(sprint_quali_date, sprint_quali_time)
 
-                print(f"  - Sprint qualifying: {sprint.date()} at {sprint.time()}")
-                print(f"  - Sprint:            {sprint.date()} at {sprint.time()}")
+                print(f"  - Sprint qualifying: {sprint_quali.date(as_local=as_local)} at {sprint_quali.time(time_fmt, as_local)}")
+                print(f"  - Sprint:            {sprint.date(as_local=as_local)} at {sprint.time(time_fmt, as_local)}")
 
-            print(f"  - Qualifying:        {quali.date()} at {quali.time()}")
-            print(f"  - Race:              {race.date()} at {race.time()}")
+            print(f"  - Qualifying:        {quali.date(as_local=as_local)} at {quali.time(time_fmt, as_local)}")
+            print(f"  - Race:              {race.date(as_local=as_local)} at {race.time(time_fmt, as_local)}")
             print()
 
             if not show_full and is_current_stage:

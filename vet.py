@@ -78,7 +78,7 @@ def match_args(args: argparse.Namespace):
 
         case "calendar":
             calendar = Calendar(args.year, f1db)
-            calendar.calendar(args.full)
+            calendar.calendar(args.full, args.utc)
 
         case "race":
             race = Race(args.id, args.year, f1db, table, args.full)
@@ -181,6 +181,7 @@ def main():
     calendar_p = subps.add_parser("calendar", help="Dates/calendar for a given season")
     calendar_p.add_argument      ("year", metavar="YEAR", type=str, nargs="?", help="Season year. Current year if omitted")
     calendar_p.add_argument      ("-f", "--full", action="store_true",         help="Show full calendar, do not stop at current stage")
+    calendar_p.add_argument      ("--utc",        action="store_true",         help="Show time in UTC format instead of local time")
 
     db_p = subps.add_parser("db", help="Different database related commands")
     db_p.add_argument      ("-s", "--sql",              type=str,             help="Run arbitrary sql script on the f1db")
