@@ -1,12 +1,12 @@
 SELECT 
-    r.date,
-    gp.name,
-    d.name,
-    co.ioc_code,
-    c.name,
-    r.laps,
-    rr.time,
-    rr.grid_position_text
+    r.date as "Date",
+    gp.name as "GP",
+    d.name as "Winner",
+    co.ioc_code "Nationality",
+    c.name "Constructor",
+    r.laps "Laps",
+    rr.time "Time",
+    rr.grid_position_text "Grid"
 FROM
     race_result rr
 LEFT JOIN

@@ -1,11 +1,11 @@
 SELECT
-    r.qualifying_date,
-    gp.name,
-    d.name,
-    co.ioc_code,
-    COALESCE(q.time, q.q3) AS time,
-    c.name,
-    q.laps
+    r.qualifying_date as "Date",
+    gp.name as "GP",
+    d.name as "Winner",
+    co.ioc_code as "Nationality",
+    COALESCE(q.time, q.q3) as "Time",
+    c.name as "Constructor",
+    q.laps as "Laps"
 FROM
     qualifying_result q
 LEFT JOIN

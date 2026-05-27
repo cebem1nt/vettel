@@ -164,7 +164,7 @@ class Race(Base):
 
     def race(self):
         if self.show_results:
-            return self.race_results()
+            return self.results()
 
         rows = self.db.run_script(
             "race/race", {"id": self.id, "year": self.year}
@@ -220,7 +220,7 @@ class Race(Base):
 
     def qualifying(self):
         if self.show_results:
-            return self.quali_results()
+            return self.results(is_quali=True)
 
         script = "race/qualifying" if self.is_full else \
                  "race/qualifying-small"
@@ -228,28 +228,15 @@ class Race(Base):
         if not self.flush_script(script, {"id": self.id, "year": self.year}):
             print(f"No race qualifying found: {self.id} - {self.year}")
 
-    def race_results(self):
-        rows = self.db.run_script("race/race-results", [self.year])
-        self.table.headers = ["Date", "Grand Prix", "Winner", "Nationality", "Constructor"]
-
-        if self.is_full:
-            self.table.headers += ["Laps", "Time", "Grid"]
-
-        for gp_date, *row in rows:
-            if not self.is_full:
-                row = row[:4]
-
-            date_formatted = Date(gp_date).date()
-            self.table.rows.append([date_formatted] + row)
+    def results(self, is_quali: bool = False):
+        script = "race/qualifying-results" if is_quali else \
+                 "race/race-results"
         
-        self.table.flush()
+        rows = self.db.run_script(script, [self.year])
+        self.table.headers = self.db.get_columns()
 
-    def quali_results(self):
-        rows = self.db.run_script("race/qualifying-results", [self.year])
-        self.table.headers = ["Date", "Grand Prix", "Winner", "Nationality", "Time"]
-
-        if self.is_full:
-            self.table.headers += ["Constructor", "Laps"]
+        if not self.is_full:
+            self.table.headers = self.table.headers[:5]
 
         for gp_date, *row in rows:
             if not self.is_full:
