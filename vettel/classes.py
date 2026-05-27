@@ -230,9 +230,12 @@ class Race(Base):
 
     def results(self, is_quali: bool = False):
         script = "race/qualifying-results" if is_quali else \
-                 "race/race-results"
+                 "race/results"
         
         rows = self.db.run_script(script, [self.year])
+        if not rows:
+            return print(f"No races found for: {self.year}")
+
         self.table.headers = self.db.get_columns()
 
         if not self.is_full:
@@ -963,6 +966,9 @@ class Standings(Base):
                  "standings/standings"
         
         rows = self.db.run_script(script, [self.year])
+        if not rows:
+            return print(f"No standings found for: {self.year}")
+
         self.table.headers = ["", "Name", "Points"]
 
         for is_winner, *row in rows:
