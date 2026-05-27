@@ -1,6 +1,8 @@
 SELECT 
-    gp.name,
+    d.id,
+    gp.id,
     r.date,
+    gp.name,
     d.name,
     c.name,
     r.laps,

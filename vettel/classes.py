@@ -19,10 +19,11 @@ from vettel.tables import Table
 from vettel.emoji import gp_flags
 
 DB_SOURCE = "https://github.com/f1db/f1db/releases/latest/download/f1db-sqlite.zip"
+DB_ZIP_NAME = "f1db-sqlite.zip"
 DB_NAME = "f1db.db"
 
 class F1DB:
-    if (xdg := os.getenv("XDG_DATA_HOME")):
+    if xdg := os.getenv("XDG_DATA_HOME"):
         db_dir = os.path.join(xdg, "vettel")
     else:
         db_dir = os.path.expanduser("~/.local/share/vettel")
@@ -33,13 +34,11 @@ class F1DB:
         self.root_dir = os.path.dirname(os.path.realpath(__file__))
         self.sql_scripts_dir = os.path.join(self.root_dir, "sql")
         
-        try:
-            self.con = sqlite3.connect(self.db_file)
-        except:
+        if not os.path.exists(self.db_file):
             print("No database found, installing...")
             self.update()
-            exit(0)
 
+        self.con = sqlite3.connect(self.db_file)
         self.cur = self.con.cursor()
 
     def run_script(
@@ -80,26 +79,25 @@ class F1DB:
         if os.path.exists(self.db_file):
             os.remove(self.db_file) 
 
-        zip_file = "f1db-sqlite.zip"
         print(f"Downloading database: {DB_SOURCE}...")
 
         try:
-            with urlopen(DB_SOURCE) as remote, open(zip_file, "wb") as local:
+            with urlopen(DB_SOURCE) as remote, open(DB_ZIP_NAME, "wb") as local:
                 local.write(remote.read())
 
         except Exception as e:
             sys.stderr.write(f"Error while downloading: {e}\n")
 
-        print(f"Extracting {zip_file}...")
+        print(f"Extracting {DB_ZIP_NAME}...")
 
         try:
-            with ZipFile(zip_file) as z:
+            with ZipFile(DB_ZIP_NAME) as z:
                 z.extractall()
         except Exception as e:
             sys.stderr.write(f"Error while extracting: {e}\n")
 
+        os.remove(DB_ZIP_NAME)
         print("Database was installed successfully!")
-        os.remove(zip_file)
 
     def execute(self, sql: str, params: Optional[Iterable]) -> list[Any]:
         self.cur.execute(sql, params)
@@ -946,30 +944,4 @@ class Standings(Base):
 
             self.table.rows.append(row)
 
-        self.table.flush()
-
-class Results(Base):
-    def __init__(
-        self,
-        year: Optional[int],
-        db: F1DB,
-        table: Table,
-    ):
-        super().__init__(db, table)
-
-        self.year = year
-        if not self.year:
-            self.year = Date("today").year()
-
-        self.table.hide_delimiters = True
-
-    def results(self):
-        self.table.headers = ["Grand Prix", "GP Date", "Winner", "Constructor", "Laps", "Finish Time"]
-        rows = self.db.run_script("results", [self.year])
-
-        for row in rows:
-            row = list(row)
-            row[1] = Date(row[1]).date()
-            self.table.rows.append(row)
-        
         self.table.flush()

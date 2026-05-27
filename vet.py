@@ -12,7 +12,6 @@ from vettel.classes import (
     Circuit,
     Calendar,
     Standings,
-    Results
 )
 
 VERSION = "1.2.0"
@@ -49,10 +48,6 @@ def match_args(args: argparse.Namespace):
         case "standings":
             standings = Standings(args.year, f1db, table)
             standings.standings(args.constructor)
-
-        case "results":
-            results = Results(args.year, f1db, table)
-            results.results()
 
         case "season":
             season = Season(args.year, args.flags, f1db, table)
@@ -154,11 +149,12 @@ def main():
     driver_p.add_argument      ("-p", "--pit-stops",    action="store_true", help="Table of pit stops for each race")
     driver_p.add_argument      ("-o", "--overview",     action="store_true", help="An overview, driver statistics for a season")
     
-    race_p = subps.add_parser("race", help="Race results")
-    race_p.add_argument      ("id",   metavar="ID",   type=str,            help="Grand prix or circuit id, e.g: monaco/china, shanghai")
-    race_p.add_argument      ("year", metavar="YEAR", type=str, nargs="?", help="Year of the race. Current year if omitted")
-    race_p.add_argument      ("-f", "--full",         action="store_true", help="Show full information table")
-    race_p.add_argument      ("-q", "--qualifying",   action="store_true", help="Show the qualifying result instead")
+    race_p = subps.add_parser("race", help="Given/all races results")
+    race_p.add_argument      ("id",   metavar="ID",      type=str,            help="Grand prix or circuit id, e.g: monaco/china, shanghai")
+    race_p.add_argument      ("year", metavar="YEAR",    type=str, nargs="?", help="Year of the race. Current year if omitted")
+    race_p.add_argument      ("-f", "--full",            action="store_true", help="Show full information table")
+    race_p.add_argument      ("-q", "--qualifying",      action="store_true", help="Show the qualifying result instead")
+    race_p.add_argument      ("-a", "--all", "--results",action="store_true", help="Show all races results")
 
     sprint_p = subps.add_parser("sprint", help="Sprint results")
     sprint_p.add_argument      ("id",   metavar="ID",   type=str,             help="Grand prix or circuit id, e.g: monaco/china, shanghai")
@@ -169,9 +165,6 @@ def main():
     standings_p = subps.add_parser("standings", help="Season driver standings")
     standings_p.add_argument      ("year", metavar="YEAR", type=str, nargs="?",  help="Season year. Current year if omitted")
     standings_p.add_argument      ("-c", "--constructor",  action="store_true",  help="Show constructor standings instead")
-
-    results_p = subps.add_parser("results", help="Season races results")
-    results_p.add_argument      ("year", metavar="YEAR", type=str, nargs="?",  help="Season year. Current year if omitted")
 
     season_p = subps.add_parser("season", help="Fancy wikipedia like season table for driver/constructor championship")
     season_p.add_argument      ("year", metavar="YEAR", type=str, nargs="?", help="Season year. Current year if omitted")
