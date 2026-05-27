@@ -11,10 +11,8 @@ from itertools import islice
 from vettel.helpers import (
     strsign, annotate_pf,
     ifnone, separator, 
-    print_comments, parse_datetime,
-    get_now, get_current_year,
-    parse_utc_time_to_local,
-    format_datetime, Streak
+    print_comments,
+    Date, Streak
 )
 
 from vettel.tables import Table
@@ -159,7 +157,7 @@ class Race(Base):
         self.is_full = is_full
 
         if not self.year:
-            self.year = get_current_year()
+            self.year = Date("today").year()
 
         if not self.is_full:
             self.table.hide_delimiters = True
@@ -239,7 +237,7 @@ class Sprint(Base):
         self.is_full = is_full
 
         if not self.year:
-            self.year = get_current_year()
+            self.year = Date("today").year()
 
         if not self.is_full:
             self.table.hide_delimiters = True
@@ -676,7 +674,7 @@ class Season(Base):
         super().__init__(db, table)
         self.year = year
         if not self.year:
-            self.year = get_current_year()
+            self.year = Date("today").year()
 
         self.add_gp_flags = add_gp_flags
 
@@ -866,14 +864,14 @@ class Calendar:
     ):
         self.year = year
         if not self.year:
-            self.year = get_current_year()
+            self.year = Date("today").year()
 
         self.db = db
 
     def calendar(self, show_full = False):
         fetched = self.db.run_script("calendar", [self.year])
         
-        now = get_now()
+        today = Date("today") 
         is_current_found = False
         separator_width = 35
 
@@ -883,10 +881,11 @@ class Calendar:
                      sprint_quali_date, sprint_quali_time in fetched:
 
             is_current_stage = False
-            race_datetime = parse_datetime(race_date, "%Y-%m-%d")
-            quali_datetime = parse_datetime(quali_date, "%Y-%m-%d")
+    
+            race = Date(race_date, race_time)
+            quali = Date(quali_date, quali_time)
 
-            if (now < race_datetime) and (not is_current_found):
+            if (today < race) and (not is_current_found):
                 is_current_stage = True
                 is_current_found = True
 
@@ -898,14 +897,14 @@ class Calendar:
             print("  " + separator(separator_width))
 
             if sprint_date:
-                sprint_datetime = parse_datetime(sprint_date, "%Y-%m-%d")
-                sprint_quali_datetime = parse_datetime(sprint_quali_date, "%Y-%m-%d")
+                sprint = Date(sprint_date, sprint_time)
+                sprint_quali = Date(sprint_quali_date, sprint_quali_time)
 
-                print(f"  - Sprint qualifying: {format_datetime(sprint_quali_datetime)} at {parse_utc_time_to_local(sprint_quali_time)}")
-                print(f"  - Sprint:            {format_datetime(sprint_datetime)} at {parse_utc_time_to_local(sprint_time)}")
+                print(f"  - Sprint qualifying: {sprint.date()} at {sprint.time()}")
+                print(f"  - Sprint:            {sprint.date()} at {sprint.time()}")
 
-            print(f"  - Qualifying:        {format_datetime(quali_datetime)} at {parse_utc_time_to_local(quali_time)}")
-            print(f"  - Race:              {format_datetime(race_datetime)} at {parse_utc_time_to_local(race_time)}")
+            print(f"  - Qualifying:        {quali.date()} at {quali.time()}")
+            print(f"  - Race:              {race.date()} at {race.time()}")
             print()
 
             if not show_full and is_current_stage:
@@ -924,7 +923,7 @@ class Standings(Base):
 
         self.year = year
         if not self.year:
-            self.year = get_current_year()
+            self.year = Date("today").year()
 
         self.table.hide_delimiters = True
 
@@ -954,7 +953,7 @@ class Results(Base):
 
         self.year = year
         if not self.year:
-            self.year = get_current_year()
+            self.year = Date("today").year()
 
         self.table.hide_delimiters = True
 
@@ -964,8 +963,7 @@ class Results(Base):
 
         for row in rows:
             row = list(row)
-            parsed_gp_date = try_parse_date(row[1])
-            row[1] = format_datetime(parsed_gp_date)
+            row[1] = Date(row[1]).date()
             self.table.rows.append(row)
         
         self.table.flush()

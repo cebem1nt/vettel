@@ -1,5 +1,6 @@
 from typing import Any, Callable, Optional
-from datetime import datetime, timezone
+from datetime import datetime, timezone as tz
+import datetime as dt
 
 SUP_F = "\u1DA0"
 SUP_P = "\u1D56"
@@ -31,6 +32,57 @@ class Streak:
     def get(self):
         return max(self.longest, self.current, key=len)
 
+class Date:
+    def __init__(
+        self, 
+        date: Optional[str],
+        time: Optional[str] = None, 
+    ):
+        self._date = None
+        self._time = None
+
+        today = self.today()
+
+        if date == "today":
+            self._date = today.date()
+            self._time = today.time()
+        else:    
+            if date: 
+                self._date = dt.date.fromisoformat(date)
+            if time: 
+                self._time = dt.time.fromisoformat(time)
+        
+        com_date = ifnone(self._date, today.date())
+        com_time = ifnone(self._time, today.time())
+
+        self._combined = datetime.combine(com_date, com_time, tz.utc)
+
+    def date(self, fmt: str = "%b %d") -> str:
+        if self._date is None:
+            return "???"
+
+        return datetime.strftime(self._combined.astimezone(), fmt)
+
+    def time(self, fmt: str = "%H:%M") -> str:
+        if self._time is None:
+            return "???"
+
+        return datetime.strftime(self._combined.astimezone(), fmt)
+
+    def year(self) -> int:
+        return self._combined.year
+
+    def __lt__(self, other):
+        return self._combined < other._combined
+
+    def __gt__(self, other):
+        return self._combined > other._combined
+
+    def today(is_utc=True) -> datetime:
+        if is_utc:
+            return datetime.now(tz=tz.utc)
+        return datetime.now()
+
 def strsign(value: int):
     sign = '+' if value > 0 else ''
     return f"{sign}{value}"
@@ -51,35 +103,3 @@ def separator(width=50):
 
 def print_comments(comments: list[str]):
     print('\n'.join(comments), end="\n\n")
-
-def get_now():
-    return datetime.now()
-
-def get_current_year():
-    return datetime.now().year
-
-def parse_utc_time_to_local(
-    date: Optional[str], 
-    format: str = "%H:%M"
-) -> str:
-    if date is None:
-        return "???"
-
-    raw = datetime.strptime(date, format)
-    intermediate = datetime.combine(get_now(), raw.time(), tzinfo=timezone.utc)
-    local = intermediate.astimezone()
-    return local.strftime(format)
-
-def format_datetime(
-    date: Optional[datetime],
-    format: str = "%b %d",
-) -> str:
-    return date.strftime(format) if date else "???"
-
-def parse_datetime(
-    date: Optional[str], 
-    format: str = "%Y-%m-%d",
-) -> Optional[datetime]:
-    if date is None:
-        return None
-    return datetime.strptime(date, format)
