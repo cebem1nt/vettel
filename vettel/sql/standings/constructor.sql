@@ -1,8 +1,8 @@
 SELECT
     scs.championship_won,
-    scs.position_text,
-    c.name,
-    scs.points
+    scs.position_text as "",
+    c.name as "Name",
+    scs.points as "Points"
 FROM
     season_constructor_standing scs
 LEFT JOIN    

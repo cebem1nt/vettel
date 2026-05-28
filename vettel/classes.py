@@ -952,10 +952,13 @@ class Standings(Base):
         year: Optional[int],
         db: F1DB,
         table: Table,
+        is_full: bool = False
     ):
         super().__init__(db, table)
 
         self.year = year
+        self.is_full = is_full
+
         if not self.year:
             self.year = Date("today").year()
 
@@ -969,7 +972,7 @@ class Standings(Base):
         if not rows:
             return print(f"No standings found for: {self.year}")
 
-        self.table.headers = ["", "Name", "Points"]
+        self.table.headers = self.db.get_columns(start=1)
 
         for is_winner, *row in rows:
             if is_winner:
