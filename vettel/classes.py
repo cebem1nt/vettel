@@ -968,7 +968,7 @@ class Standings(Base):
         script = "standings/constructor" if is_constructor else \
                  "standings/standings"
         
-        rows = self.db.run_script(script, [self.year])
+        rows = self.db.run_script(script, {"year": self.year})
         if not rows:
             return print(f"No standings found for: {self.year}")
 

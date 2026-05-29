@@ -8,6 +8,6 @@ FROM
 LEFT JOIN    
     constructor c ON c.id = scs.constructor_id
 WHERE
-    scs.year = ?
+    scs.year = :year
 ORDER BY
     scs.points DESC
