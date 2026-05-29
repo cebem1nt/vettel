@@ -16,7 +16,7 @@ from vettel.helpers import (
 )
 
 from vettel.tables import Table
-from vettel.emoji import gp_flags
+from vettel.emoji import gp_flags, get_ioc_flag
 
 DB_SOURCE = "https://github.com/f1db/f1db/releases/latest/download/f1db-sqlite.zip"
 DB_ZIP_NAME = "f1db-sqlite.zip"
@@ -964,7 +964,7 @@ class Standings(Base):
 
         self.table.hide_delimiters = True
 
-    def standings(self, is_constructor=False):
+    def standings(self, is_constructor: bool = False, show_flags: bool = False):
         script = "standings/constructor" if is_constructor else \
                  "standings/standings"
         
@@ -975,6 +975,9 @@ class Standings(Base):
         self.table.headers = self.db.get_columns(start=1)
 
         for is_winner, *row in rows:
+            if not is_constructor and show_flags:
+                row[2] = f"{get_ioc_flag(row[2])} {row[2]}"
+
             if is_winner:
                 row[1] = f"♔ {row[1]}" # "👑" messes alignment
 

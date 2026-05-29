@@ -47,7 +47,7 @@ def match_args(args: argparse.Namespace):
         
         case "standings":
             standings = Standings(args.year, f1db, table)
-            standings.standings(args.constructor)
+            standings.standings(args.constructor, args.flags)
 
         case "season":
             season = Season(args.year, args.flags, f1db, table)
@@ -165,6 +165,7 @@ def main():
     standings_p = subps.add_parser("standings", help="Season driver standings")
     standings_p.add_argument      ("year", metavar="YEAR", type=str, nargs="?",  help="Season year. Current year if omitted")
     standings_p.add_argument      ("-c", "--constructor",  action="store_true",  help="Show constructor standings instead")
+    standings_p.add_argument      ("--flags",              action="store_true",  help="Add emoji flags to driver's nationality")
 
     season_p = subps.add_parser("season", help="Fancy wikipedia like season table for driver/constructor championship")
     season_p.add_argument      ("year", metavar="YEAR", type=str, nargs="?", help="Season year. Current year if omitted")

@@ -54,3 +54,41 @@ gp_flags = {
     "united-states": "🇺🇸",
     "united-states-west": "🇺🇸"
 }
+
+_ioc_to_alpha2 = {
+    "AFG":"AF","ALB":"AL","ALG":"DZ","ASA":"AS","AND":"AD","ANG":"AO","ANT":"AG",
+    "ARG":"AR","ARM":"AM","ARU":"AW","AUS":"AU","AUT":"AT","AZE":"AZ","BAH":"BS",
+    "BRN":"BH","BAN":"BD","BAR":"BB","BLR":"BY","BEL":"BE","BIZ":"BZ","BEN":"BJ",
+    "BER":"BM","BHU":"BT","BOL":"BO","BIH":"BA","BOT":"BW","BRA":"BR","IVB":"VG",
+    "BRU":"BN","BUL":"BG","BUR":"BF","BDI":"BI","CAM":"KH","CMR":"CM","CAN":"CA",
+    "CPV":"CV","CAY":"KY","CAF":"CF","CHA":"TD","CHI":"CL","CHN":"CN","COL":"CO",
+    "COM":"KM","COK":"CK","CRC":"CR","CRO":"HR","CUB":"CU","CYP":"CY","CZE":"CZ",
+    "COD":"CD","DEN":"DK","DJI":"DJ","DMA":"DM","DOM":"DO","TLS":"TL","ECU":"EC",
+    "EGY":"EG","ESA":"SV","GEQ":"GQ","ERI":"ER","EST":"EE","SWZ":"SZ","ETH":"ET",
+    "FRO":"FO","FSM":"FM","FIJ":"FJ","FIN":"FI","FRA":"FR","GAB":"GA","GAM":"GM",
+    "GEO":"GE","GER":"DE","GHA":"GH","GIB":"GI","GRE":"GR","GRN":"GD","GUM":"GU",
+    "GUA":"GT","GBS":"GW","GUI":"GN","GUY":"GY","HAI":"HT","HON":"HN","HKG":"HK",
+    "HUN":"HU","ISL":"IS","IND":"IN","INA":"ID","IRI":"IR","IRQ":"IQ","IRL":"IE",
+    "ISR":"IL","ITA":"IT","CIV":"CI","JAM":"JM","JPN":"JP","JOR":"JO","KAZ":"KZ",
+    "KEN":"KE","KIR":"KI","KUW":"KW","KGZ":"KG","LAO":"LA","LAT":"LV","LBN":"LB",
+    "LES":"LS","LBR":"LR","LBA":"LY","LIE":"LI","LTU":"LT","LUX":"LU","MAC":"MO",
+    "MAD":"MG","MAW":"MW","MAS":"MY","MDV":"MV","MLI":"ML","MLT":"MT","MHL":"MH",
+    "MTN":"MR","MRI":"MU","MEX":"MX","MDA":"MD","MON":"MC","MGL":"MN","MNE":"ME",
+    "MNE":"ME","MAR":"MA","MOZ":"MZ","MYA":"MM","NAM":"NA","NRU":"NR","NEP":"NP",
+    "NED":"NL","NZL":"NZ","NCA":"NI","NIG":"NE","NGR":"NG","NOR":"NO","PRK":"KP",
+    "MKD":"MK","OMA":"OM","PAK":"PK","PLW":"PW","PLE":"PS","PAN":"PA","PNG":"PG",
+    "PAR":"PY","PER":"PE","PHI":"PH","POL":"PL","POR":"PT","QAT":"QA","CGO":"CG",
+    "ROU":"RO","RUS":"RU","RWA":"RW","SKN":"KN","LCA":"LC","VIN":"VC","SAM":"WS",
+    "SMR":"SM","STP":"ST","KSA":"SA","SEN":"SN","SRB":"RS","SEY":"SC","SLE":"SL",
+    "SGP":"SG","SVK":"SK","SLO":"SI","SOL":"SB","SOM":"SO","RSA":"ZA","KOR":"KR",
+    "SSD":"SS","ESP":"ES","SRI":"LK","SUD":"SD","SUR":"SR","SWE":"SE","SUI":"CH",
+    "SYR":"SY","TPE":"TW","TJK":"TJ","TAN":"TZ","THA":"TH","TOG":"TG","TGA":"TO",
+    "TTO":"TT","TUN":"TN","TUR":"TR","TKM":"TM","TUV":"TV","UGA":"UG","UKR":"UA",
+    "UAE":"AE","GBR":"GB","USA":"US","ISV":"VI","URU":"UY","UZB":"UZ","VAN":"VU",
+    "VAT":"VA","VEN":"VE","VIE":"VN","ZAM":"ZM","ZIM":"ZW",
+    "GUA":"GT","GRN":"GD","GLP":"GP","MTQ":"MQ","ESH":"EH"
+}
+
+def get_ioc_flag(ioc: str):
+    a2 = _ioc_to_alpha2[ioc]
+    return ''.join(chr(ord(ch.upper()) - ord('A') + 0x1F1E6) for ch in a2)
