@@ -52,6 +52,38 @@ vet season 2023 --flags >> README.md
 <table><tr>
 <td>
 
+```
+vet standings --flags
+```
+```
+       Name                Nationality   Constructor    Points  
+                                                                
+  1    Kimi Antonelli      🇮🇹 ITA        Mercedes       131     
+  2    George Russell      🇬🇧 GBR        Mercedes       88      
+  3    Charles Leclerc     🇲🇨 MON        Ferrari        75      
+  4    Lewis Hamilton      🇬🇧 GBR        Ferrari        72      
+  5    Lando Norris        🇬🇧 GBR        McLaren        58      
+  6    Oscar Piastri       🇦🇺 AUS        McLaren        48      
+  7    Max Verstappen      🇳🇱 NED        Red Bull       43      
+  8    Pierre Gasly        🇫🇷 FRA        Alpine         20      
+  9    Oliver Bearman      🇬🇧 GBR        Haas           18      
+  10   Liam Lawson         🇳🇿 NZL        Racing Bulls   16      
+  11   Franco Colapinto    🇦🇷 ARG        Alpine         15      
+  12   Isack Hadjar        🇫🇷 FRA        Red Bull       14      
+  13   Carlos Sainz Jr.    🇪🇸 ESP        Williams       6       
+  14   Arvid Lindblad      🇬🇧 GBR        Racing Bulls   5       
+  15   Gabriel Bortoleto   🇧🇷 BRA        Audi           2       
+  16   Esteban Ocon        🇫🇷 FRA        Haas           1       
+  17   Alexander Albon     🇹🇭 THA        Williams       1       
+  18   Nico Hülkenberg     🇩🇪 GER        Audi           0       
+  19   Valtteri Bottas     🇫🇮 FIN        Cadillac       0       
+  20   Sergio Pérez        🇲🇽 MEX        Cadillac       0       
+  21   Lance Stroll        🇨🇦 CAN        Aston Martin   0       
+  22   Fernando Alonso     🇪🇸 ESP        Aston Martin   0       
+```
+</td>
+<td>
+  
 ```sh
 vet circuit silverstone --most-wins -r=30
 ```
@@ -291,17 +323,18 @@ vet db --update
 ## Misc
 
 ```
-usage: vet [-h] [--double-headers] [--no-delimiters] [--adjustment {left,center,right}] {circuit,driver,race,sprint,season,calendar,db} ...
+usage: vet [-h] [--double-headers] [--no-delimiters] [--adjustment {left,center,right}] [--version] {circuit,driver,race,sprint,standings,season,calendar,db} ...
 
 Different info, statistics, records, all time bests of Formula One
 
 positional arguments:
-  {circuit,driver,race,sprint,season,calendar,db}
+  {circuit,driver,race,sprint,standings,season,calendar,db}
                         Available commands
     circuit             Get different records for a circuit
     driver              Different driver's statistics, data over the season or all time
-    race                Race results
+    race                Show exact/all races results for given year
     sprint              Sprint results
+    standings           Season driver standings
     season              Fancy wikipedia like season table for driver/constructor championship
     calendar            Dates/calendar for a given season
     db                  Different database related commands
@@ -312,4 +345,5 @@ options:
   --no-delimiters       Do not print any separators for tables
   --adjustment {left,center,right}
                         Table text alignment
+  --version             Show vettel version and exit
 ```
