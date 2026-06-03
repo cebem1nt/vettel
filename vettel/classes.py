@@ -217,6 +217,9 @@ class Race(Base):
         script = "race/qualifying" if self.is_full else \
                  "race/qualifying-small"
 
+        if self.is_full and self.year < 2006:
+            script = "race/qualifying-pre-2006" # Simpler just hardcode it here
+
         if not self.flush_script(script, {"id": self.id, "year": self.year}):
             print(f"No race qualifying found: {self.id} - {self.year}")
 
