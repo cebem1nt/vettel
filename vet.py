@@ -76,9 +76,11 @@ def match_args(args: argparse.Namespace):
             calendar.calendar(args.full, args.utc)
 
         case "race":
-            race = Race(args.id, args.year, f1db, table, args.full, args.results)
+            race = Race(args.id, args.year, f1db, table, args.full)
 
-            if args.qualifying:
+            if args.results:
+                race.results(args.qualifying)
+            elif args.qualifying:
                 race.qualifying()
             else:
                 race.race()
@@ -154,7 +156,7 @@ def main():
     race_p.add_argument      ("year", metavar="YEAR",    type=str, nargs="?", help="Year of the race. Current year if omitted")
     race_p.add_argument      ("-f", "--full",            action="store_true", help="Show full information table")
     race_p.add_argument      ("-q", "--qualifying",      action="store_true", help="Show the qualifying result instead")
-    race_p.add_argument      ("-a", "--results", "--all",action="store_true", help="Show all races results")
+    race_p.add_argument      ("-r", "--results",         action="store_true", help="Show races results for the given year")
 
     sprint_p = subps.add_parser("sprint", help="Sprint results")
     sprint_p.add_argument      ("id",   metavar="ID",   type=str,             help="Grand prix or circuit id, e.g: monaco/china, shanghai")
@@ -190,8 +192,14 @@ def main():
 
     args = p.parse_args()
 
-    if args.command == "race" and not (args.id or args.results): # id is ignored if there is --all
-        race_p.error("one of the arguments 'ID' or --all/--results is required")
+    # Some post validation for a bit weird race parser
+    if args.command == "race":
+        if args.results and args.id:
+            race_p.error("--results is not available with ID")
+
+        if not (args.results or args.id):
+            race_p.error("--results OR ID is required")
+
 
     if args.version:
         print('v'+VERSION)

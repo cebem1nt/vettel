@@ -148,13 +148,11 @@ class Race(Base):
         db: F1DB,
         table: Table,
         is_full: bool = False,
-        show_results: bool = False
     ):
         super().__init__(db, table)
         self.id = id
         self.year = year
         self.is_full = is_full
-        self.show_results = show_results or id.lower() == "results"
 
         if not self.year:
             self.year = Date("today").year()
@@ -163,9 +161,6 @@ class Race(Base):
             self.table.hide_delimiters = True
 
     def race(self):
-        if self.show_results:
-            return self.results()
-
         rows = self.db.run_script(
             "race/race", {"id": self.id, "year": self.year}
         )
@@ -219,9 +214,6 @@ class Race(Base):
             print_comments(dnf_comments)
 
     def qualifying(self):
-        if self.show_results:
-            return self.results(is_quali=True)
-
         script = "race/qualifying" if self.is_full else \
                  "race/qualifying-small"
 
