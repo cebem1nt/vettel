@@ -317,14 +317,20 @@ class Driver(Base):
         id: str, 
         year: int,
         db: F1DB,
-        table: Table
+        table: Table,
+        is_all_time: bool = False
     ):
         super().__init__(db, table)
         self.id = id
+
+        if not year:
+            year = Date("today").year()
+
         self.year = year
+        self.is_all_time = is_all_time
 
     def races(self):
-        if not self.year:
+        if self.is_all_time:
             rows = self.db.run_script(
                 "driver/races", 
                 params={"id": self.id}
@@ -372,7 +378,7 @@ class Driver(Base):
         print_comments(comments)
 
     def pits(self):
-        if not self.year:
+        if self.is_all_time:
             rows = self.db.run_script(
                 "driver/pits", 
                 params={"id": self.id}
@@ -420,19 +426,21 @@ class Driver(Base):
         self.table.flush()
 
     def qualifying(self):
-        if self.year:
-            self.flush_script("driver/qualifying", {"id": self.id, "year": self.year}, extra_sql="and race.year = :year")
-        else:
+        if self.is_all_time:
             self.flush_script("driver/qualifying", {"id": self.id} )
+        else:
+            self.flush_script("driver/qualifying", {"id": self.id, "year": self.year}, 
+                              extra_sql="and race.year = :year")
 
     def sprints(self):
-        if self.year:
-            self.flush_script("driver/sprints", {"id": self.id, "year": self.year}, extra_sql="and race.year = :year")
-        else:
+        if self.is_all_time:
             self.flush_script("driver/sprints", {"id": self.id} )
+        else:
+            self.flush_script("driver/sprints", {"id": self.id, "year": self.year}, 
+                              extra_sql="and race.year = :year")
 
     def overview(self):
-        if not self.year:
+        if self.is_all_time:
             rows = self.db.run_script(
                 "driver/overview", 
                 params={"id": self.id}
@@ -621,13 +629,13 @@ class Driver(Base):
             problematic_pits = sum(1 for t in pit_times if t > problematic_thresh)
             avg_pit_time = mean([t for t in pit_times if t < problematic_thresh])
 
-        print(f"\nSeason overview — {self.id} ({self.year if self.year else "All time"})")
+        print(f"\nSeason overview — {self.id} ({"All time" if self.is_all_time else self.year})")
         print("-" * 50)
         print(f"Races: {total["races"]}  Finished: {total["finished"]}  Not finished/started: {not_finished} ",
               f"(rate: {not_finished_rate:.1%})" if not_finished > 0 else '', end="\n\n")
 
         print("Points")
-        print(f"- Total pts: {total["pts"]} pts { f"({season_pts_pos} place)" if self.year else '' }")
+        print(f"- Total pts: {total["pts"]} pts { '' if self.is_all_time else f"({season_pts_pos} place)"}")
         print(f"- Team pts share: {points_share:.2%}")
         print(f"- Pts per race: {pts_per_race:.2f} pts")
         print(f"- Avg pts when scoring: {avg_points_when_scoring:.2f} pts")

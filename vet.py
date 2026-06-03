@@ -54,9 +54,9 @@ def match_args(args: argparse.Namespace):
             season.championship(args.constructor)
 
         case "driver":
-            driver = Driver(args.id, args.year, f1db, table)
+            driver = Driver(args.id, args.year, f1db, table, args.all_time)
 
-            if args.overview or argc == 3 or (argc == 4 and args.year):
+            if args.overview or argc == 3 or (argc == 4 and (args.year or args.all_time)):
                 driver.overview()
 
             if args.races:
@@ -126,11 +126,12 @@ def match_args(args: argparse.Namespace):
 def main():
     p = argparse.ArgumentParser(description="Different info, statistics, records, all time bests of Formula One")
 
-    subps = p.add_subparsers(dest="command", help="Available commands")
     p.add_argument("--double-headers", action="store_true",                                 help="Print table headers twice (at the top and bottom)")
     p.add_argument("--no-delimiters",  action="store_true",                                 help="Do not print any separators for tables")
     p.add_argument("--adjustment",     default="left", choices=("left", "center", "right"), help="Table text alignment")
     p.add_argument("--version",        action="store_true",                                 help="Show vettel version and exit")
+
+    subps = p.add_subparsers(dest="command", help="Available commands")
 
     circuit_p = subps.add_parser("circuit", help="Get different records for a circuit")
     circuit_p.add_argument      ("id",  metavar="ID",        type=str,            help="Circuit id")
@@ -144,12 +145,13 @@ def main():
 
     driver_p = subps.add_parser("driver", help="Different driver's statistics, data over the season or all time")
     driver_p.add_argument      ("id",   metavar="ID",   type=str,            help="Driver id")
-    driver_p.add_argument      ("year", metavar="YEAR", type=int, nargs="?", help="Optional season year, if omitted, all time")
-    driver_p.add_argument      ("-r", "--races",        action="store_true", help="Table of driver season races")
-    driver_p.add_argument      ("-s", "--sprints",      action="store_true", help="Table of driver season sprints")
-    driver_p.add_argument      ("-q", "--qualifying",   action="store_true", help="Table of driver race qualifyings")
+    driver_p.add_argument      ("year", metavar="YEAR", type=int, nargs="?", help="Optional season year. Current year if omitted")
+    driver_p.add_argument      ("-r", "--races",        action="store_true", help="Driver race results for given season")
+    driver_p.add_argument      ("-s", "--sprints",      action="store_true", help="Driver season sprints results")
+    driver_p.add_argument      ("-q", "--qualifying",   action="store_true", help="Driver qualifying results for the season")
     driver_p.add_argument      ("-p", "--pit-stops",    action="store_true", help="Table of pit stops for each race")
     driver_p.add_argument      ("-o", "--overview",     action="store_true", help="An overview, driver statistics for a season")
+    driver_p.add_argument      ("-a", "--all-time",     action="store_true", help="Show all time results instead")
     
     race_p = subps.add_parser("race", help="Show exact/all races results for given year")
     race_p.add_argument      ("id",   metavar="ID",      type=str, nargs="?", help="Grand prix or circuit id, e.g: monaco/china, shanghai")
@@ -179,6 +181,7 @@ def main():
     calendar_p.add_argument      ("-f", "--full", action="store_true",         help="Show full calendar, do not stop at current stage")
     calendar_p.add_argument      ("--utc",        action="store_true",         help="Show time in UTC format instead of local time")
 
+    # TODO perhaps split search into a sub-parser?
     db_p = subps.add_parser("db", help="Different database related commands")
     db_p.add_argument      ("-s", "--sql",              type=str,             help="Run arbitrary sql script on the f1db")
     db_p.add_argument      ("-u", "--update", "--init", action="store_true",  help="Update/init f1db")
@@ -192,14 +195,13 @@ def main():
 
     args = p.parse_args()
 
-    # Some post validation for a bit weird race parser
+    # Some extra validation for a bit weird race parser
     if args.command == "race":
         if args.results and args.id:
             race_p.error("--results is not available with ID")
 
         if not (args.results or args.id):
             race_p.error("--results OR ID is required")
-
 
     if args.version:
         print('v'+VERSION)
