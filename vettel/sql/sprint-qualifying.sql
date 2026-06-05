@@ -1,12 +1,12 @@
 SELECT
-    driver.name as driver,
-    constructor.name as constructor,
-    q.qualifying_q1 as q1,
-    q.qualifying_q2 as q2,
-    q.qualifying_q3 as q3,
-    q.qualifying_gap as gap,
-    q.qualifying_laps as laps,
-    r.race_grid_position_text as grid
+    driver.name as "Driver",
+    constructor.name as "Constructor",
+    q.qualifying_q1 as "Q1",
+    q.qualifying_q2 as "Q2",
+    q.qualifying_q3 as "Q3",
+    q.qualifying_gap as "Gap",
+    q.qualifying_laps as "Laps",
+    r.race_grid_position_text as "Grid"
 FROM
     race_data q
 JOIN

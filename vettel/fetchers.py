@@ -105,19 +105,17 @@ class F1DB:
 class Fetcher:
     def __init__(self):
         self.db = F1DB()
-        self.headers = None
 
-    def get(self):
-        raise NotImplementedError()
+    def _db_get_as_dict(self, script: str):
+        cur = self.db.con.cursor()
+        cur.row_factory = dict_row_factory
+        return self.db.run_script(script, self.params, overwrite_cursor=cur)
 
-    def get_as_dict(self):
-        raise NotImplementedError()
-
-    def as_dict(self, row: Row) -> Opt[dict]:
-        if not self.headers:
+    def row_to_dict(self, row: Row, headers: Headers) -> Opt[dict]:
+        if not headers:
             return None
 
-        return {header: row[idx] for idx, header in enumerate(self.headers)}
+        return {header: row[idx] for idx, header in enumerate(headers)}
 
 class Race(Fetcher):
     def __init__(self, id: str, year: Opt[int]):
@@ -129,21 +127,24 @@ class Race(Fetcher):
         self.year = year
         self.params = {"id": id, "year": year}
 
+        self.quali_script = "qualifying-pre-2006" if year < 2006 else \
+                            "qualifying"
+
     def get(self) -> tuple[Headers, Opt[Rows]]:
-        self.headers, rows = self.db.run_script("race", self.params)
-        return self.headers, rows
+        return self.db.run_script("race", self.params)
 
     def get_as_dict(self) -> tuple[Headers, Opt[DictRows]]:
-        cur = self.db.con.cursor()
-        cur.row_factory = dict_row_factory
+        return self._db_get_as_dict("race")
         
-        self.headers, rows = self.db.run_script("race", self.params, overwrite_cursor=cur)
-        return self.headers, rows
+    def get_quali(self) -> tuple[Headers, Opt[Rows]]:
+        return self.db.run_script(self.quali_script, self.params)
 
-class Qualifying(Fetcher):
+    def get_quali_as_dict(self) -> tuple[Headers, Opt[DictRows]]:
+        return self._db_get_as_dict(self.quali_script)
+
+class Sprint(Fetcher):
     def __init__(self, id: str, year: Opt[int]):
         super().__init__()
-
         if not year:
             year = Today().year()
         
@@ -151,19 +152,17 @@ class Qualifying(Fetcher):
         self.year = year
         self.params = {"id": id, "year": year}
 
-        self.script = "qualifying-pre-2006" if year < 2006 else \
-                      "qualifying"
-        
     def get(self) -> tuple[Headers, Opt[Rows]]:
-        self.headers, rows = self.db.run_script(self.script, self.params)
-        return self.headers, rows
+        return self.db.run_script("sprint", self.params)
 
     def get_as_dict(self) -> tuple[Headers, Opt[DictRows]]:
-        cur = self.db.con.cursor()
-        cur.row_factory = dict_row_factory
-        
-        self.headers, rows = self.db.run_script(self.script, self.params, overwrite_cursor=cur)
-        return self.headers, rows
+        return self._db_get_as_dict("sprint")
+
+    def get_quali(self) -> tuple[Headers, Opt[Rows]]:
+        return self.db.run_script("sprint-qualifying", self.params)
+
+    def get_quali_as_dict(self) -> tuple[Headers, Opt[DictRows]]:
+        return self._db_get_as_dict("sprint-qualifying")
 
 class Results(Fetcher):
     def __init__(self, year: Opt[int], is_quali: bool):
@@ -177,12 +176,7 @@ class Results(Fetcher):
                       "results"
 
     def get(self) -> tuple[Headers, Opt[Rows]]:
-        self.headers, rows = self.db.run_script(self.script, self.params)
-        return self.headers, rows
+        return self.db.run_script(self.script, self.params)
 
     def get_as_dict(self) -> tuple[Headers, Opt[DictRows]]:
-        cur = self.db.con.cursor()
-        cur.row_factory = dict_row_factory
-        
-        self.headers, rows = self.db.run_script(self.script, self.params, overwrite_cursor=cur)
-        return self.headers, rows
+        return self._db_get_as_dict(self.script)

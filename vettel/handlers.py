@@ -22,30 +22,8 @@ from vettel.tables import Table
 from vettel.emoji import gp_flags, get_ioc_flag
 
 class Handler:
-    def flush_script(
-        self, 
-        script: str, 
-        params: Iterable[Any], 
-        extra_sql: Optional[str] = None,
-        auto_headers: bool = True
-    ) -> bool:
-        if self.table is None:
-            raise ValueError("Table is None")
-
-        rows = self.db.run_script(
-            script, params, extra_sql
-        )
-
-        if not rows:
-            return False
-
-        self.table.rows = rows
-        
-        if auto_headers:
-            self.table.headers = self.db.get_columns()
-        
-        self.table.flush()
-        return True
+    def __init__(self, table: Table):
+        self.table = table
 
 class Race(Handler):
     def __init__(
@@ -55,16 +33,17 @@ class Race(Handler):
         table: Table,
         is_full: bool = False,
     ):
-        self.table = table
+        super().__init__(table)
         self.is_full = is_full
         self.id = id
         self.year = year
+        self.fetcher = fetchers.Race(id, year)
 
         if not self.is_full:
             self.table.hide_delimiters = True
 
     def race(self):
-        headers, rows = fetchers.Race(self.id, self.year).get()
+        headers, rows = self.fetcher.get()
 
         if not rows:
             return print(f"No race found: {self.id} - {self.year}")
@@ -109,9 +88,8 @@ class Race(Handler):
             print_comments(dnf_comments)
 
     def qualifying(self):
-        fetcher = fetchers.Qualifying(self.id, self.year)
-        headers, rows = fetcher.get() if self.is_full else \
-                        fetcher.get_as_dict()
+        headers, rows = self.fetcher.get_quali() if self.is_full else \
+                        self.fetcher.get_quali_as_dict()
 
         if not rows:
             return print(f"No race qualifying found: {self.id} - {self.year}")
@@ -153,66 +131,75 @@ class Sprint(Handler):
         self,
         id: str, 
         year: int,
-        db: F1DB,
         table: Table,
         is_full: bool = False
     ):
-        super().__init__(db, table)
+        super().__init__(table)
         self.id = id
         self.year = year
         self.is_full = is_full
-
-        if not self.year:
-            self.year = Date("today").year()
+        self.fetcher = fetchers.Sprint(id, year)
 
         if not self.is_full:
             self.table.hide_delimiters = True
 
     def sprint(self):
-        rows = self.db.run_script(
-            "sprint/sprint", {"id": self.id, "year": self.year}
-        )
-
+        headers, rows = self.fetcher.get() 
         if not rows:
             return print(f"No sprint found: {self.id} - {self.year}")
 
         if self.is_full:
-            self.table.headers = self.db.get_columns(2)
+            self.table.headers = headers[3:]
         else:
-            self.table.headers = ["Driver", "Finish", "Points"]
+            self.table.headers = ["Finish", "Driver", "Points"]
 
         comments = []
         dnf_comments = []
 
-        for pos_gained, reason_retired, *row in rows:
-            
-            if row[2] == "1":
-                comments.append(f"Pole position: {row[0]}")
+        for pos_gained, reason_retired, penalty, *row in rows:
+            driver = row[1]
 
-            if pos_gained:
-                row[3] += f" ({strsign(pos_gained)})"
+            if reason_retired:
+                dnf_comments.append(f"{driver} - Reason retired: {reason_retired}")
 
-            if reason_retired is not None:
-                dnf_comments.append(f"{row[0]} - Reason retired: {reason_retired}")
+            if pos_gained: row[3] += f" ({strsign(pos_gained)})"
+
+            if penalty:
+                row[0] += '*'
+                comments.append(f"* - {driver} got {penalty}s penalty")
 
             if self.is_full:
                 self.table.add_row(row)
             else:
-                self.table.add_row([row[0], row[3], row[-1]])
+                self.table.add_row([driver, row[3], row[-1]])
 
         self.table.flush()
-        print_comments(comments)
+        if comments: 
+            print_comments(comments)
 
         if dnf_comments:
             print(separator())
             print_comments(dnf_comments)
 
     def qualifying(self):
-        script = "sprint/qualifying" if self.is_full else \
-                 "sprint/qualifying-small"
+        headers, rows = self.fetcher.get_quali() if self.is_full else \
+                        self.fetcher.get_quali_as_dict()
 
-        if not self.flush_script(script, {"id": self.id, "year": self.year}):
-            print(f"No sprint qualifying found: {self.id} - {self.year}")
+        if not rows:
+            return print(f"No sprint qualifying found: {self.id} - {self.year}")
+
+        self.table.headers = headers
+        self.table.rows = rows
+
+        if not self.is_full:
+            self.table.headers = ["Driver", "Time", "Grid"]
+            self.table.rows = []
+            
+            for inf in rows:
+                q = inf.get("Q3") or inf.get("Q2") or inf.get("Q1")
+                self.table.add_row([inf["Driver"], q, inf["Grid"]])
+
+        self.table.flush()
 
 class Driver(Handler):
     def __init__(

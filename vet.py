@@ -84,7 +84,7 @@ def match_args(args: argparse.Namespace):
                 race.race()
 
         case "sprint":
-            sprint = Sprint(args.id, args.year, f1db, table, args.full)
+            sprint = Sprint(args.id, args.year, table, args.full)
 
             if args.qualifying:
                 sprint.qualifying()
