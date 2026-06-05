@@ -11,6 +11,7 @@ from vettel.helpers import (
 Headers = List[str]
 Row = sqlite3.Row
 Rows = List[Row]
+DictRows = List[dict]
 Cursor = sqlite3.Cursor
 Opt = Optional
 
@@ -106,10 +107,10 @@ class Fetcher:
         self.db = F1DB()
         self.headers = None
 
-    def get(self) -> tuple[Headers, Opt[Rows]]:
+    def get(self):
         raise NotImplementedError()
 
-    def get_as_dict(self) -> Opt[List[dict]]:
+    def get_as_dict(self):
         raise NotImplementedError()
 
     def as_dict(self, row: Row) -> Opt[dict]:
@@ -132,12 +133,12 @@ class Race(Fetcher):
         self.headers, rows = self.db.run_script("race", self.params)
         return self.headers, rows
 
-    def get_as_dict(self) -> Opt[List[dict]]:
+    def get_as_dict(self) -> tuple[Headers, Opt[DictRows]]:
         cur = self.db.con.cursor()
         cur.row_factory = dict_row_factory
         
-        rows, _ = self.db.run_script("race", self.params, overwrite_cursor=cur)
-        return rows
+        self.headers, rows = self.db.run_script("race", self.params, overwrite_cursor=cur)
+        return self.headers, rows
 
 class Qualifying(Fetcher):
     def __init__(self, id: str, year: Opt[int]):
@@ -157,8 +158,31 @@ class Qualifying(Fetcher):
         self.headers, rows = self.db.run_script(self.script, self.params)
         return self.headers, rows
 
-    def get_as_dict(self) -> Opt[List[dict]]:
+    def get_as_dict(self) -> tuple[Headers, Opt[DictRows]]:
         cur = self.db.con.cursor()
         cur.row_factory = dict_row_factory
-        _, rows = self.db.run_script(self.script, self.params, overwrite_cursor=cur)
-        return rows
+        
+        self.headers, rows = self.db.run_script(self.script, self.params, overwrite_cursor=cur)
+        return self.headers, rows
+
+class Results(Fetcher):
+    def __init__(self, year: Opt[int], is_quali: bool):
+        super().__init__()
+        if not year:
+            year = Today().year()
+        
+        self.year = year
+        self.params = [year]
+        self.script = "qualifying-results" if is_quali else \
+                      "results"
+
+    def get(self) -> tuple[Headers, Opt[Rows]]:
+        self.headers, rows = self.db.run_script(self.script, self.params)
+        return self.headers, rows
+
+    def get_as_dict(self) -> tuple[Headers, Opt[DictRows]]:
+        cur = self.db.con.cursor()
+        cur.row_factory = dict_row_factory
+        
+        self.headers, rows = self.db.run_script(self.script, self.params, overwrite_cursor=cur)
+        return self.headers, rows

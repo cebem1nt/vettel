@@ -117,3 +117,6 @@ def separator(width=50):
 
 def print_comments(comments: list[str]):
     print('\n'.join(comments), end="\n\n")
+
+def format_date(date: str, is_local: bool):
+    return Date(date).date(as_local=is_local)

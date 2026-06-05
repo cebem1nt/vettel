@@ -77,7 +77,7 @@ def match_args(args: argparse.Namespace):
             race = Race(args.id, args.year, table, args.full)
 
             if args.results:
-                race.results(args.qualifying)
+                race.results(args.qualifying, args.utc)
             elif args.qualifying:
                 race.qualifying()
             else:
@@ -127,6 +127,7 @@ def main():
     p.add_argument("--double-headers", action="store_true",                                 help="Print table headers twice (at the top and bottom)")
     p.add_argument("--no-delimiters",  action="store_true",                                 help="Do not print any separators for tables")
     p.add_argument("--adjustment",     default="left", choices=("left", "center", "right"), help="Table text alignment")
+    p.add_argument("--utc",            action="store_true",                                 help="Show time in UTC instead of local timezone")
     p.add_argument("--version",        action="store_true",                                 help="Show vettel version and exit")
 
     subps = p.add_subparsers(dest="command", help="Available commands")
@@ -158,6 +159,7 @@ def main():
     race_p.add_argument      ("-q", "--qualifying",      action="store_true", help="Show the qualifying result instead")
     race_p.add_argument      ("-r", "--results",         action="store_true", help="Show races results for the given year")
 
+
     sprint_p = subps.add_parser("sprint", help="Sprint results")
     sprint_p.add_argument      ("id",   metavar="ID",   type=str,             help="Grand prix or circuit id, e.g: monaco/china, shanghai")
     sprint_p.add_argument      ("year", metavar="YEAR", type=int, nargs="?",  help="Year of the sprint. Current year if omitted")
@@ -177,7 +179,6 @@ def main():
     calendar_p = subps.add_parser("calendar", help="Dates/calendar for a given season")
     calendar_p.add_argument      ("year", metavar="YEAR", type=int, nargs="?", help="Season year. Current year if omitted")
     calendar_p.add_argument      ("-f", "--full", action="store_true",         help="Show full calendar, do not stop at current stage")
-    calendar_p.add_argument      ("--utc",        action="store_true",         help="Show time in UTC format instead of local time")
 
     # TODO perhaps split search into a sub-parser?
     db_p = subps.add_parser("db", help="Different database related commands")

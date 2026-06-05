@@ -12,7 +12,8 @@ from vettel.helpers import (
     strsign, annotate_pf,
     ifnone, separator, 
     print_comments,
-    Date, Streak
+    Date, Streak,
+    format_date
 )
 
 from vettel import fetchers
@@ -109,33 +110,31 @@ class Race(Handler):
 
     def qualifying(self):
         fetcher = fetchers.Qualifying(self.id, self.year)
-        headers, rows = fetcher.get()
+        headers, rows = fetcher.get() if self.is_full else \
+                        fetcher.get_as_dict()
 
         if not rows:
             return print(f"No race qualifying found: {self.id} - {self.year}")
 
-        if self.is_full:
-            self.table.headers = headers
-            self.table.rows = rows
-        else:
-            for row in rows:
-                inf = fetcher.as_dict(row)
+        self.table.headers = headers
+        self.table.rows = rows
+
+        if not self.is_full:
+            self.table.headers = ["Driver", "Time", "Grid"]
+            self.table.rows = []
+            
+            for inf in rows:
                 q = inf.get("Time") or inf.get("Q3") or inf.get("Q2") or inf.get("Q1")
                 self.table.add_row([inf["Driver"], q, inf["Grid"]])
 
-            self.table.headers = ["Driver", "Time", "Grid"]
-
         self.table.flush()
 
-    def results(self, is_quali: bool = False):
-        script = "race/qualifying-results" if is_quali else \
-                 "race/results"
+    def results(self, is_quali: bool, is_utc: bool):
+        fetcher = fetchers.Results(self.year, is_quali)
+        self.table.headers, rows = fetcher.get()
         
-        rows = self.db.run_script(script, [self.year])
         if not rows:
             return print(f"No races found for: {self.year}")
-
-        self.table.headers = self.db.get_columns()
 
         if not self.is_full:
             self.table.headers = self.table.headers[:5]
@@ -144,7 +143,7 @@ class Race(Handler):
             if not self.is_full:
                 row = row[:4]
 
-            date_formatted = Date(gp_date).date()
+            date_formatted = format_date(gp_date, not is_utc)
             self.table.rows.append([date_formatted] + row)
         
         self.table.flush()
