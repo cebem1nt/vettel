@@ -1,4 +1,4 @@
-import sqlite3, os, sys
+import os, sys
 
 from typing import Iterable, Optional, Tuple, Any
 from statistics import mean, stdev, median, median_low, median_high, mode
@@ -15,106 +15,12 @@ from vettel.helpers import (
     Date, Streak
 )
 
+from vettel import fetchers
+
 from vettel.tables import Table
 from vettel.emoji import gp_flags, get_ioc_flag
 
-DB_SOURCE = "https://github.com/f1db/f1db/releases/latest/download/f1db-sqlite.zip"
-DB_ZIP_NAME = "f1db-sqlite.zip"
-DB_NAME = "f1db.db"
-
-class F1DB:
-    if xdg := os.getenv("XDG_DATA_HOME"):
-        db_dir = os.path.join(xdg, "vettel")
-    else:
-        db_dir = os.path.expanduser("~/.local/share/vettel")
-
-    db_file = os.path.join(db_dir, DB_NAME)
-
-    def __init__(self):
-        self.root_dir = os.path.dirname(os.path.realpath(__file__))
-        self.sql_scripts_dir = os.path.join(self.root_dir, "sql")
-        
-        if not os.path.exists(self.db_file):
-            print("No database found, installing...")
-            self.update()
-
-        self.con = sqlite3.connect(self.db_file)
-        self.cur = self.con.cursor()
-
-    def run_script(
-        self, 
-        name: str, 
-        params: Optional[Iterable] = None,
-        extra_sql: Optional[str] = None
-    ) -> list[Any]:
-        script = os.path.join(self.sql_scripts_dir, name + ".sql")
-        
-        with open(script) as s:
-            sql = s.read()
-
-        if extra_sql:
-            sql += extra_sql
-
-        if params:
-            self.cur.execute(sql, params)
-        else:
-            self.cur.execute(sql)
-
-        return self.cur.fetchall()
-
-    def run_file(self, file: str) -> tuple[list[Any], list[str]]:
-        with open(file) as f:
-            content = f.read()
-        
-        self.cur.execute(content)
-        return (
-            self.cur.fetchall(), 
-            [c[0] for c in self.cur.description]
-        )
-
-    def update(self):
-        os.makedirs(self.db_dir, exist_ok=True)
-        os.chdir(self.db_dir)
-        
-        if os.path.exists(self.db_file):
-            os.remove(self.db_file) 
-
-        print(f"Downloading database: {DB_SOURCE}...")
-
-        try:
-            with urlopen(DB_SOURCE) as remote, open(DB_ZIP_NAME, "wb") as local:
-                local.write(remote.read())
-
-        except Exception as e:
-            sys.stderr.write(f"Error while downloading: {e}\n")
-
-        print(f"Extracting {DB_ZIP_NAME}...")
-
-        try:
-            with ZipFile(DB_ZIP_NAME) as z:
-                z.extractall()
-        except Exception as e:
-            sys.stderr.write(f"Error while extracting: {e}\n")
-
-        os.remove(DB_ZIP_NAME)
-        print("Database was installed successfully!")
-
-    def execute(self, sql: str, params: Optional[Iterable]) -> list[Any]:
-        self.cur.execute(sql, params)
-        return self.cur.fetchall()
-
-    def get_columns(self, start=0) -> list[Any]:
-        return [c[0] for c in self.cur.description[start:]] 
-
-class Base:
-    def __init__(
-        self,
-        db_handler: F1DB,
-        out_table: Optional[Table] = None
-    ):
-        self.db = db_handler
-        self.table = out_table
-
+class Handler:
     def flush_script(
         self, 
         script: str, 
@@ -140,71 +46,59 @@ class Base:
         self.table.flush()
         return True
 
-class Race(Base):
+class Race(Handler):
     def __init__(
         self,
         id: str, 
         year: int,
-        db: F1DB,
         table: Table,
         is_full: bool = False,
     ):
-        super().__init__(db, table)
+        self.table = table
+        self.is_full = is_full
         self.id = id
         self.year = year
-        self.is_full = is_full
-
-        if not self.year:
-            self.year = Date("today").year()
 
         if not self.is_full:
             self.table.hide_delimiters = True
 
     def race(self):
-        rows = self.db.run_script(
-            "race/race", {"id": self.id, "year": self.year}
-        )
+        headers, rows = fetchers.Race(self.id, self.year).get()
 
         if not rows:
             return print(f"No race found: {self.id} - {self.year}")
 
-        if self.is_full:
-            self.table.headers = self.db.get_columns(6)
-        else:
-            self.table.headers = ["Driver", "Finish", "Points"]
-
         comments = []
         dnf_comments = []
 
-        for is_fastest, is_pole, reason_retired, pts_pos_gained, fastest_lap_gap, pos_gained, \
-            *row in rows:
-            
-            driver = row[0]
+        for is_fastest, _, reason_retired, pts_pos_gained, fastest_lap_gap, pos_gained, penalty, *row in rows:
+            driver = row[1]
 
             if is_fastest:
-                comments.append(
-                    f"Fastest lap: {driver} - {row[-5]} (lap {row[-4]})"
-                )
+                comments.append(f"Fastest lap: {driver} - {row[-3]} (lap {row[-4]})\n")
 
-            if is_pole:
-                comments.append(f"Pole position: {driver}")
-
-            if reason_retired is not None:
+            if reason_retired:
                 dnf_comments.append(f"{driver} - Reason retired: {reason_retired}")
 
             if pos_gained:
-                row[3] += f" ({strsign(pos_gained)})"
+                row[0] += f" ({strsign(pos_gained)})"
 
-            if pts_pos_gained:
-                row[-2] += f" ({strsign(pts_pos_gained)})"
+            if penalty:
+                row[0] += '*'
+                comments.append(f"* - {driver} got {penalty}s penalty")
 
-            if fastest_lap_gap:
-                row[-5] += f" ({fastest_lap_gap})"
+            if pts_pos_gained:  row[-2] += f" ({strsign(pts_pos_gained)})"
+            if fastest_lap_gap: row[-3] += f" ({fastest_lap_gap})"
 
             if self.is_full:
                 self.table.add_row(row)
             else:
-                self.table.add_row([row[0], row[3], row[-1]])
+                self.table.add_row([row[0], driver, row[-1]])
+
+        if self.is_full:
+            self.table.headers = headers[7:] # Strip these, we used first 7 columns for some anotations 
+        else:
+            self.table.headers = ["Finish", "Driver", "Points"]
 
         self.table.flush()
         print_comments(comments)
@@ -214,14 +108,24 @@ class Race(Base):
             print_comments(dnf_comments)
 
     def qualifying(self):
-        script = "race/qualifying" if self.is_full else \
-                 "race/qualifying-small"
+        fetcher = fetchers.Qualifying(self.id, self.year)
+        headers, rows = fetcher.get()
 
-        if self.is_full and self.year < 2006:
-            script = "race/qualifying-pre-2006" # Simpler just hardcode it here
+        if not rows:
+            return print(f"No race qualifying found: {self.id} - {self.year}")
 
-        if not self.flush_script(script, {"id": self.id, "year": self.year}):
-            print(f"No race qualifying found: {self.id} - {self.year}")
+        if self.is_full:
+            self.table.headers = headers
+            self.table.rows = rows
+        else:
+            for row in rows:
+                inf = fetcher.as_dict(row)
+                q = inf.get("Time") or inf.get("Q3") or inf.get("Q2") or inf.get("Q1")
+                self.table.add_row([inf["Driver"], q, inf["Grid"]])
+
+            self.table.headers = ["Driver", "Time", "Grid"]
+
+        self.table.flush()
 
     def results(self, is_quali: bool = False):
         script = "race/qualifying-results" if is_quali else \
@@ -245,7 +149,7 @@ class Race(Base):
         
         self.table.flush()
 
-class Sprint(Base):
+class Sprint(Handler):
     def __init__(
         self,
         id: str, 
@@ -311,7 +215,7 @@ class Sprint(Base):
         if not self.flush_script(script, {"id": self.id, "year": self.year}):
             print(f"No sprint qualifying found: {self.id} - {self.year}")
 
-class Driver(Base):
+class Driver(Handler):
     def __init__(
         self,
         id: str, 
@@ -694,7 +598,7 @@ class Driver(Base):
         print(f"- Longest points streak: {pts_streak}" +
               (f"\n  * {longest_pts_streak}" if pts_streak else ''))
 
-class Season(Base):
+class Season(Handler):
     def __init__(
         self, 
         year: int,
@@ -775,7 +679,7 @@ class Season(Base):
         self.table.headers = ["pos", "name"] + grandprix_cols + ["pts"]
         self.table.flush()
 
-class Circuit(Base):
+class Circuit(Handler):
     def __init__(
         self, 
         id: str,
@@ -949,7 +853,7 @@ class Calendar:
                 print()
                 break
 
-class Standings(Base):
+class Standings(Handler):
     def __init__(
         self,
         year: Optional[int],

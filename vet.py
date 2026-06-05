@@ -2,8 +2,7 @@
 import os, argparse, sys
 
 from vettel.tables import Table
-from vettel.classes import (
-    F1DB, 
+from vettel.handlers import (
     DB,
     Race,
     Sprint,
@@ -23,12 +22,11 @@ def match_args(args: argparse.Namespace):
         args.no_delimiters
     )
 
-    f1db = F1DB() 
     argc = len(sys.argv)
 
     match args.command:
         case "circuit":
-            circuit = Circuit(args.id, args.rows, args.reverse, f1db, table)
+            circuit = Circuit(args.id, args.rows, args.reverse, table)
 
             if args.info or argc == 3:
                 circuit.info()
@@ -56,7 +54,7 @@ def match_args(args: argparse.Namespace):
         case "driver":
             driver = Driver(args.id, args.year, f1db, table, args.all_time)
 
-            if args.overview or argc == 3 or (argc == 4 and (args.year or args.all_time)):
+            if args.overview:
                 driver.overview()
 
             if args.races:
@@ -76,7 +74,7 @@ def match_args(args: argparse.Namespace):
             calendar.calendar(args.full, args.utc)
 
         case "race":
-            race = Race(args.id, args.year, f1db, table, args.full)
+            race = Race(args.id, args.year, table, args.full)
 
             if args.results:
                 race.results(args.qualifying)
@@ -144,14 +142,14 @@ def main():
     circuit_p.add_argument      ("-r",  "--rows", type=int,  default=15,          help="Amount of rows to fetch, -1 means all. Defaults to 15")
 
     driver_p = subps.add_parser("driver", help="Different driver's statistics, data over the season or all time")
-    driver_p.add_argument      ("id",   metavar="ID",   type=str,            help="Driver id")
-    driver_p.add_argument      ("year", metavar="YEAR", type=int, nargs="?", help="Optional season year. Current year if omitted")
-    driver_p.add_argument      ("-r", "--races",        action="store_true", help="Driver race results for given season")
-    driver_p.add_argument      ("-s", "--sprints",      action="store_true", help="Driver season sprints results")
-    driver_p.add_argument      ("-q", "--qualifying",   action="store_true", help="Driver qualifying results for the season")
-    driver_p.add_argument      ("-p", "--pit-stops",    action="store_true", help="Table of pit stops for each race")
-    driver_p.add_argument      ("-o", "--overview",     action="store_true", help="An overview, driver statistics for a season")
-    driver_p.add_argument      ("-a", "--all-time",     action="store_true", help="Show all time results instead")
+    driver_p.add_argument      ("id",  metavar="ID",        type=str,            help="Driver id")
+    driver_p.add_argument      ("year",metavar="YEAR",      type=int, nargs="?", help="Optional season year. Current year if omitted")
+    driver_p.add_argument      ("-o",  "--overview",        action="store_true", help="An overview, driver statistics for a season")
+    driver_p.add_argument      ("-r",  "--races",           action="store_true", help="Driver race results for given season")
+    driver_p.add_argument      ("-s",  "--sprints",         action="store_true", help="Driver season sprints results")
+    driver_p.add_argument      ("-q",  "--qualifying",      action="store_true", help="Driver qualifying results for the season")
+    driver_p.add_argument      ("-p",  "--pit-stops",       action="store_true", help="Table of pit stops for each race")
+    driver_p.add_argument      ("-a",  "--all-time",        action="store_true", help="Show all time results instead")
     
     race_p = subps.add_parser("race", help="Show exact/all races results for given year")
     race_p.add_argument      ("id",   metavar="ID",      type=str, nargs="?", help="Grand prix or circuit id, e.g: monaco/china, shanghai")

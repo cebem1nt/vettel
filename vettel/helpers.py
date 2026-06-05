@@ -93,6 +93,10 @@ class Date:
             return datetime.now(tz=tz.utc)
         return datetime.now()
 
+class Today(Date):
+    def __init__(self):
+        super().__init__("today")
+
 def strsign(value: int):
     sign = '+' if value > 0 else ''
     return f"{sign}{value}"
