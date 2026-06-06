@@ -1,6 +1,6 @@
 import sqlite3, os
 
-from typing import Any, List, Optional
+from typing import Any, List, Optional, Iterable
 from pprint import pprint
 
 from vettel.helpers import (
@@ -106,7 +106,7 @@ class Fetcher:
     def __init__(self):
         self.db = F1DB()
 
-    def _db_get_as_dict(self, script: str):
+    def _db_get_as_dict(self, script: str, params: Iterable):
         cur = self.db.con.cursor()
         cur.row_factory = dict_row_factory
         return self.db.run_script(script, self.params, overwrite_cursor=cur)
@@ -180,3 +180,39 @@ class Results(Fetcher):
 
     def get_as_dict(self) -> tuple[Headers, Opt[DictRows]]:
         return self._db_get_as_dict(self.script)
+
+class Driver(Fetcher):
+    def __init__(self, id: str, year: Opt[int]):
+        super().__init__()
+        if not year:
+            year = Today().year()
+        
+        self.id = id
+        self.year = year
+        self.params = {"id": self.id, "year": self.year}
+
+    def __all_time_dynamic(self, script: str, is_all_time: bool):
+        params = {"id": self.id}
+        extra_sql = ""
+
+        if not is_all_time:
+            params["year"] = self.year
+            extra_sql = " and r.year = :year"
+
+        return self.db.run_script(script, params, extra_sql)
+
+    def get_races(self, is_all_time: bool):
+        return self.__all_time_dynamic("driver/races", is_all_time)
+        
+    def get_qualifying(self, is_all_time: bool) -> tuple[Headers, Opt[Rows]]:
+        return self.__all_time_dynamic("driver/qualifying", is_all_time)
+
+    def get_sprints(self, is_all_time: bool) -> tuple[Headers, Opt[Rows]]:
+        return self.__all_time_dynamic("driver/sprints", is_all_time)
+
+    def get_overview(self, is_all_time: bool) -> tuple[Headers, Opt[Rows]]:
+        return self.__all_time_dynamic("driver/overview", is_all_time)
+
+    def get_pits(self) -> tuple[Headers, Opt[Rows]]:
+        return self.db.run_script("driver/pits", self.params)
+

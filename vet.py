@@ -52,22 +52,13 @@ def match_args(args: argparse.Namespace):
             season.championship(args.constructor)
 
         case "driver":
-            driver = Driver(args.id, args.year, f1db, table, args.all_time)
+            driver = Driver(args.id, args.year, table, args.all_time)
 
-            if args.overview:
-                driver.overview()
-
-            if args.races:
-                driver.races()
-            
-            if args.pit_stops:
-                driver.pits()
-
-            if args.qualifying:
-                driver.qualifying()
-
-            if args.sprints:
-                driver.sprints()
+            if args.overview:   driver.overview()
+            if args.races:      driver.races()
+            if args.pit_stops:  driver.pits()
+            if args.qualifying: driver.qualifying()
+            if args.sprints:    driver.sprints()
 
         case "calendar":
             calendar = Calendar(args.year, f1db)

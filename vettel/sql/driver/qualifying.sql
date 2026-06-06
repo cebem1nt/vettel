@@ -11,9 +11,9 @@ SELECT
 FROM
     race_data q
 JOIN
-    race on race.id = q.race_id
+    race r on r.id = q.race_id
 JOIN
-    grand_prix on grand_prix.id = race.grand_prix_id
+    grand_prix on grand_prix.id = r.grand_prix_id
 WHERE    
     q.type = 'QUALIFYING_RESULT' and
     q.driver_id = :id

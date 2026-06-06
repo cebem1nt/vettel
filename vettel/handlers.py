@@ -206,84 +206,68 @@ class Driver(Handler):
         self,
         id: str, 
         year: int,
-        db: F1DB,
         table: Table,
         is_all_time: bool = False
     ):
-        super().__init__(db, table)
+        super().__init__(table)
         self.id = id
 
         if not year:
             year = Date("today").year()
 
+        self.fetcher = fetchers.Driver(id, year)
         self.year = year
         self.is_all_time = is_all_time
 
     def races(self):
-        if self.is_all_time:
-            rows = self.db.run_script(
-                "driver/races", 
-                params={"id": self.id}
-            )
-        else:
-            rows = self.db.run_script(
-                "driver/races",
-                extra_sql="and race.year = :year",
-                params={"id": self.id, "year": self.year} 
-            )
+        headers, rows = self.fetcher.get_races(self.is_all_time)
 
-        self.table.headers = self.db.get_columns(6)
         comments = []
-
+        dnf_comments = []
         teams_played = defaultdict(int)
-        finished = 2
 
-        for is_fastest, is_pole, reason_retired, team, \
-            pts_pos_gained, gap_from_fastest_lap, *row in rows:
+        self.table.headers = headers[7:]
 
-            if reason_retired is not None:
-                comments.append(f"* Retired because of - {reason_retired}")
-                row[finished] += '*'
+        for is_fastest, is_pole, reason_retired, pts_pos_gained, fastest_gap, pos_gained, penalty, *row in rows:
+            row[3] = annotate_pf(row[3], is_pole, is_fastest)
+            team = row[1]
 
-            row[finished] = annotate_pf(row[finished], is_pole, is_fastest)
+            if penalty:
+                comments.append(f"{row[0]} - got {penalty}s penalty")
+                row[3] += '*'
 
-            if pts_pos_gained:
-                row[-2] += f" ({strsign(pts_pos_gained)})"
+            if reason_retired:
+                dnf_comments.append(f"{row[0]} - Retired because of {reason_retired}")
+                row[3] += '*'
 
-            if gap_from_fastest_lap:
-                row[-5] += f" ({gap_from_fastest_lap})"
+            if fastest_gap:     row[-4] += f" ({fastest_gap})"
+            if pts_pos_gained:  row[-2] += f" ({strsign(pts_pos_gained)})"
             
             self.table.add_row(row)
             teams_played[team] += 1
 
-        comments.append(separator())
+        self.table.flush()
 
         for team, total in teams_played.items():
             if len(teams_played) == 1:
-                comments.append(f"All {total} races completed in: {team}")
+                print(f"All {total} races completed in: {team}")
             else:
-                comments.append(f"{total} races completed in {team}")
+                print(f"{total} races completed in {team}")
 
-        self.table.flush()
-        print_comments(comments)
+        if comments:
+            print(separator())
+            print_comments(comments)
+
+        if dnf_comments:
+            print(separator())
+            print_comments(dnf_comments)
 
     def pits(self):
-        if self.is_all_time:
-            rows = self.db.run_script(
-                "driver/pits", 
-                params={"id": self.id}
-            )
-        else:
-            rows = self.db.run_script(
-                "driver/pits",
-                extra_sql="and race.year = :year",
-                params={"id": self.id, "year": self.year} 
-            )
-
+        _, rows = self.fetcher.get_pits()
         races_pits = defaultdict(list)
         most_pits = -1
 
-        for race, lap, time in rows:
+        for _, race, lap, time in rows:
             pit = {
                 "lap": lap,
                 "time": time
@@ -292,14 +276,14 @@ class Driver(Handler):
             races_pits[race].append(pit)
             total_pits = len(races_pits[race])
 
-            if  total_pits > most_pits:
+            if total_pits > most_pits:
                 most_pits = total_pits
 
         self.table.headers = ['Grand prix'] + [f"pit {i+1}" for i in range(most_pits)] + ['']
 
         for race, pits in races_pits.items():
             row = [race]
-            total_pits = 0
+            total_pits = 0   
             
             for i in range(most_pits):
                 if i >= len(pits):
@@ -316,31 +300,15 @@ class Driver(Handler):
         self.table.flush()
 
     def qualifying(self):
-        if self.is_all_time:
-            self.flush_script("driver/qualifying", {"id": self.id} )
-        else:
-            self.flush_script("driver/qualifying", {"id": self.id, "year": self.year}, 
-                              extra_sql="and race.year = :year")
+        self.table.headers, self.table.rows = self.fetcher.get_qualifying(self.is_all_time)
+        self.table.flush()
 
     def sprints(self):
-        if self.is_all_time:
-            self.flush_script("driver/sprints", {"id": self.id} )
-        else:
-            self.flush_script("driver/sprints", {"id": self.id, "year": self.year}, 
-                              extra_sql="and race.year = :year")
+        self.table.headers, self.table.rows = self.fetcher.get_sprints(self.is_all_time)
+        self.table.flush()
 
     def overview(self):
-        if self.is_all_time:
-            rows = self.db.run_script(
-                "driver/overview", 
-                params={"id": self.id}
-            )
-        else:
-            rows = self.db.run_script(
-                "driver/overview",
-                extra_sql="and r.year = :year",
-                params={"id": self.id, "year": self.year} 
-            )
+        _, rows = self.fetcher.get_overview(self.is_all_time)
     
         if not rows:
             return print(f"No data found for {self.id} - {self.year}")
@@ -480,23 +448,8 @@ class Driver(Handler):
 
         points_share = total["pts"] / total["team_pts"]
 
-        # pit stops
-        sql = """
-            SELECT 
-                pit.pit_stop_time_millis 
-            FROM race_data pit 
-            JOIN race on race.id = pit.race_id 
-            WHERE 
-                pit.type = 'PIT_STOP' 
-                and pit.driver_id = :id 
-        """
-
-        if self.year:
-            sql += "and race.year = :year"
-            rows = self.db.execute(sql, {"id": self.id, "year": self.year})
-        else:
-            rows = self.db.execute(sql, {"id": self.id })
-
+        _, rows = self.fetcher.get_pits()
+        
         pit_times = []
         problematic_pits = 0
         avg_pit_time = 0

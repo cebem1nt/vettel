@@ -16,9 +16,9 @@ SELECT
 FROM
     race_data q
 JOIN
-    race on race.id = q.race_id
+    race r on r.id = q.race_id
 JOIN
-    grand_prix on grand_prix.id = race.grand_prix_id
+    grand_prix on grand_prix.id = r.grand_prix_id
 LEFT JOIN
     race_data r on r.driver_id = :id and
     r.race_id = q.race_id and
