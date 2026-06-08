@@ -1,6 +1,4 @@
-import os, sys
-
-from typing import Iterable, Optional, Tuple, Any
+from typing import Iterable, Optional
 from statistics import mean, stdev, median, median_low, median_high, mode
 
 from collections import defaultdict
@@ -20,9 +18,7 @@ from vettel.database import F1DB
 from vettel.tables import Table
 from vettel.emoji import gp_flags, get_ioc_flag
 
-class Handler:
-    def __init__(self, table: Table):
-        self.table = table
+Opt = Optional
 
 class DB:
     def __init__(
@@ -70,7 +66,7 @@ class DB:
             for i in range(len(headers)):
                 print(f"{headers[i]}: {found[i]}")
 
-class Race(Handler):
+class Race:
     def __init__(
         self,
         id: str, 
@@ -78,7 +74,7 @@ class Race(Handler):
         table: Table,
         is_full: bool = False,
     ):
-        super().__init__(table)
+        self.table = table
         self.is_full = is_full
         self.id = id
         self.year = year
@@ -171,7 +167,7 @@ class Race(Handler):
         
         self.table.flush()
 
-class Sprint(Handler):
+class Sprint:
     def __init__(
         self,
         id: str, 
@@ -179,7 +175,7 @@ class Sprint(Handler):
         table: Table,
         is_full: bool = False
     ):
-        super().__init__(table)
+        self.table = table
         self.id = id
         self.year = year
         self.is_full = is_full
@@ -246,7 +242,7 @@ class Sprint(Handler):
 
         self.table.flush()
 
-class Driver(Handler):
+class Driver:
     def __init__(
         self,
         id: str, 
@@ -254,7 +250,7 @@ class Driver(Handler):
         table: Table,
         is_all_time: bool = False
     ):
-        super().__init__(table)
+        self.table = table
         self.id = id
 
         self.fetcher = fetchers.Driver(id, year)
@@ -579,14 +575,14 @@ class Driver(Handler):
         print(f"- Longest points streak: {pts_streak}" +
               (f"\n  * {longest_pts_streak}" if pts_streak else ''))
 
-class Season(Handler):
+class Season:
     def __init__(
         self, 
         year: int,
         add_gp_flags: bool,
         table: Table
     ):
-        super().__init__(table)
+        self.table = table
         self.year = year
         self.add_gp_flags = add_gp_flags
 
@@ -648,7 +644,7 @@ class Season(Handler):
         self.table.headers = ["pos", "name"] + grandprix_cols + ["pts"]
         self.table.flush()
 
-class Circuit(Handler):
+class Circuit:
     def __init__(
         self, 
         id: str,
@@ -656,7 +652,7 @@ class Circuit(Handler):
         is_reversed: bool,
         table: Table
     ):
-        super().__init__(table)
+        self.table = table
         self.id = id
         self.rows = rows
         self.is_reversed = is_reversed
@@ -757,14 +753,14 @@ class Calendar:
                 print()
                 break
 
-class Standings(Handler):
+class Standings:
     def __init__(
         self,
-        year: Optional[int],
+        year: Opt[int],
         table: Table,
         is_full: bool = False
     ):
-        super().__init__(table)
+        self.table = table
         if not year:
             year = Today().year()
 

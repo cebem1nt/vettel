@@ -1,9 +1,9 @@
 import sqlite3
 
-from typing import Any, List, Optional, Iterable
+from typing import List, Optional, Iterable
 from pprint import pprint
 
-from vettel.helpers import Today, ifnone
+from vettel.helpers import Today
 from vettel.database import F1DB
 
 # My attempt on saving ugly bulky python types

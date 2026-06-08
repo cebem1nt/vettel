@@ -13,7 +13,7 @@ from vettel.handlers import (
     Standings,
 )
 
-VERSION = "1.2.0"
+VERSION = "1.3.0"
 
 def match_args(args: argparse.Namespace):
     table = Table(
@@ -31,17 +31,10 @@ def match_args(args: argparse.Namespace):
             if args.info or argc == 3:
                 circuit.info()
 
-            if args.best_lap:
-                circuit.record("best-lap")
-
-            if args.best_qualifying:
-                circuit.record("best-qualifying")
-
-            if args.most_wins:
-                circuit.record("most-wins")
-
-            if args.most_podiums:
-                circuit.record("most-podiums")
+            if args.best_lap:           circuit.record("best-lap")
+            if args.best_qualifying:    circuit.record("best-qualifying")
+            if args.most_wins:          circuit.record("most-wins")
+            if args.most_podiums:       circuit.record("most-podiums")
         
         case "standings":
             standings = Standings(args.year, table)
