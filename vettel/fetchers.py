@@ -3,7 +3,7 @@ import sqlite3
 from typing import Any, List, Optional, Iterable
 from pprint import pprint
 
-from vettel.helpers import Today
+from vettel.helpers import Today, ifnone
 from vettel.database import F1DB
 
 # My attempt on saving ugly bulky python types
@@ -136,16 +136,27 @@ class Driver(Fetcher):
     def get_pits(self) -> tuple[Headers, Opt[Rows]]:
         return self.db.run_script("driver/pits", self.params)
 
-class Raw(Fetcher):
-    def __init__(self):
-        super().__init__()
-
-    def get(self, sql: str, params: Opt[Iterable]):
-        return self._get_raw_sql(sql, params)
-
 class Misc(Fetcher):
     def __init__(self):
         super().__init__()
+
+    def get_raw_sql(self, sql: str, params: Opt[Iterable]):
+        return self._get_raw_sql(sql, params)
+
+    def get_raw_script(self, script: str, params: Opt[Iterable] = None):
+        return self.db.run_script(script, params)
+
+    def get_season_gps(self, year: Opt[int]):
+        if not year:
+            year = Today().year()
+
+        return self.db.run_script("season", {"year": year})
+
+    def get_calendar(self, year: Opt[int]):
+        if not year:
+            year = Today().year()
+
+        return self.db.run_script("calendar", [year])
 
     def get_gps(self, year: Opt[int]):
         sql = """
@@ -162,8 +173,14 @@ class Misc(Fetcher):
         
         return self._get_raw_sql(sql, [year])
 
-    def get_season_gps(self, year: Opt[int]):
-        if not year:
-            year = Today().year()
+    def get_circuit_info(self, id: str): 
+        sql = """
+            SELECT 
+                circuit.*, 
+                GROUP_CONCAT(race.year ,',') as years 
+            FROM circuit 
+            JOIN race on race.circuit_id = :id 
+            WHERE circuit.id = :id
+        """
 
-        return self.db.run_script("season", {"year": year})
+        return self._get_raw_sql(sql, {"id": id})

@@ -11,7 +11,7 @@ from vettel.helpers import (
     ifnone, separator, 
     print_comments,
     Date, Streak,
-    format_date
+    format_date, Today
 )
 
 from vettel import fetchers
@@ -654,45 +654,34 @@ class Circuit(Handler):
         id: str,
         rows: int,
         is_reversed: bool,
-        db: F1DB,
         table: Table
     ):
-        super().__init__(db, table)
+        super().__init__(table)
         self.id = id
         self.rows = rows
         self.is_reversed = is_reversed
+        self.fetcher = fetchers.Misc() 
 
-    def record(
-        self, 
-        script: str
-    ):
-        fetched = self.db.run_script(os.path.join("circuit", script), [self.id])
+    def record(self, script: str):
+        self.table.headers, fetched = self.fetcher.get_raw_script(f"circuit/{script}", [self.id])
+
         if self.rows != -1:
             fetched = fetched[:self.rows]
 
         if self.is_reversed:
             fetched.reverse()
 
-        self.table.headers = self.db.get_columns()
         self.table.rows = fetched
         self.table.flush()
 
     def info(self, years_per_row=8):
-        sql = """
-            SELECT 
-                circuit.*, 
-                GROUP_CONCAT(race.year ,',') as years 
-            FROM circuit 
-            JOIN race on race.circuit_id = :id 
-            WHERE circuit.id = :id
-        """
-        fetched = self.db.execute(sql, {"id": self.id})[0]
+        _, rows = self.fetcher.get_circuit_info(self.id)
 
-        if not fetched or fetched[0] is None:
+        if not rows:
             return print(f"Circuit: \"{self.id}\" was not found")
 
         _, name, full_name, prev_names, circuit_type, direction, \
-        place, country_id, lat, lon, length, turns, total_races, races_years = fetched
+        place, country_id, lat, lon, length, turns, total_races, races_years = rows[0]
 
         print()
         print(f"* {name} ({full_name})")
@@ -714,19 +703,12 @@ class Circuit(Handler):
         print(f"{lat},{lon}\n")
 
 class Calendar:
-    def __init__(
-        self,
-        year: int,
-        db: F1DB,
-    ):
+    def __init__(self, year: int):
         self.year = year
-        if not self.year:
-            self.year = Date("today").year()
 
-        self.db = db
-
-    def calendar(self, show_full = False, is_utc = False):
-        fetched = self.db.run_script("calendar", [self.year])
+    def calendar(self, show_full: bool = False, is_utc: bool = False):
+        fetcher = fetchers.Misc()
+        _, rows = fetcher.get_calendar(self.year)
         
         today = Date("today") 
         is_current_found = False
@@ -741,7 +723,7 @@ class Calendar:
         for rnd, gp, race_date, race_time, \
                      sprint_date, sprint_time, \
                      quali_date, quali_time, \
-                     sprint_quali_date, sprint_quali_time in fetched:
+                     sprint_quali_date, sprint_quali_time in rows:
 
             is_current_stage = False
 
@@ -779,29 +761,29 @@ class Standings(Handler):
     def __init__(
         self,
         year: Optional[int],
-        db: F1DB,
         table: Table,
         is_full: bool = False
     ):
-        super().__init__(db, table)
+        super().__init__(table)
+        if not year:
+            year = Today().year()
 
         self.year = year
         self.is_full = is_full
 
-        if not self.year:
-            self.year = Date("today").year()
-
+        self.fetcher = fetchers.Misc()
         self.table.hide_delimiters = True
 
     def standings(self, is_constructor: bool = False, show_flags: bool = False):
         script = "standings/constructor" if is_constructor else \
                  "standings/standings"
         
-        rows = self.db.run_script(script, {"year": self.year})
+        headers, rows = self.fetcher.get_raw_script(script, {"year": self.year})
+
         if not rows:
             return print(f"No standings found for: {self.year}")
 
-        self.table.headers = self.db.get_columns(start=1)
+        self.table.headers = headers[1:]
 
         for is_winner, *row in rows:
             if not is_constructor and show_flags:
