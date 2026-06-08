@@ -44,11 +44,11 @@ def match_args(args: argparse.Namespace):
                 circuit.record("most-podiums")
         
         case "standings":
-            standings = Standings(args.year, f1db, table)
+            standings = Standings(args.year, table)
             standings.standings(args.constructor, args.flags)
 
         case "season":
-            season = Season(args.year, args.flags, f1db, table)
+            season = Season(args.year, args.flags, table)
             season.championship(args.constructor)
 
         case "driver":
@@ -61,7 +61,7 @@ def match_args(args: argparse.Namespace):
             if args.sprints:    driver.sprints()
 
         case "calendar":
-            calendar = Calendar(args.year, f1db)
+            calendar = Calendar(args.year)
             calendar.calendar(args.full, args.utc)
 
         case "race":
@@ -83,7 +83,7 @@ def match_args(args: argparse.Namespace):
                 sprint.sprint()
 
         case "db":
-            db = DB(f1db, table)
+            db = DB(table)
 
             if args.sql:
                 db.execute_sql(args.sql)

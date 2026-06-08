@@ -1,11 +1,10 @@
-import sqlite3, os
+import sqlite3
 
 from typing import Any, List, Optional, Iterable
 from pprint import pprint
 
-from vettel.helpers import (
-    Today
-)
+from vettel.helpers import Today
+from vettel.database import F1DB
 
 # My attempt on saving ugly bulky python types
 Headers = List[str]
@@ -15,92 +14,8 @@ DictRows = List[dict]
 Cursor = sqlite3.Cursor
 Opt = Optional
 
-DB_SOURCE = "https://github.com/f1db/f1db/releases/latest/download/f1db-sqlite.zip"
-DB_ZIP_NAME = "f1db-sqlite.zip"
-DB_NAME = "f1db.db"
-
 def dict_row_factory(cursor: Cursor, row: Row):
     return {col[0]: row[idx] for idx, col in enumerate(cursor.description)}
-
-class F1DB:
-    if xdg := os.getenv("XDG_DATA_HOME"):
-        db_dir = os.path.join(xdg, "vettel")
-    else:
-        db_dir = os.path.expanduser("~/.local/share/vettel")
-
-    db_file = os.path.join(db_dir, DB_NAME)
-
-    def __init__(self):
-        self.root_dir = os.path.dirname(os.path.realpath(__file__))
-        self.sql_scripts_dir = os.path.join(self.root_dir, "sql")
-        
-        if not os.path.exists(self.db_file):
-            print("No database found, installing...")
-            self.update()
-
-        self.con = sqlite3.connect(self.db_file)
-        self.cur = self.con.cursor()
-
-    def run_script(
-        self, 
-        name: str, 
-        params: Iterable = [],
-        extra_sql: Opt[str] = None,
-        overwrite_cursor: Opt[Cursor] = None
-    ) -> tuple[Headers, Opt[Rows]]:
-        script = os.path.join(self.sql_scripts_dir, name + ".sql")
-
-        cur = overwrite_cursor if overwrite_cursor else \
-              self.cur
-
-        with open(script) as s:
-            sql = s.read()
-
-        if extra_sql:
-            sql += extra_sql
-
-        cur.execute(sql, params)
-        return [c[0] for c in cur.description], cur.fetchall()
-
-    def run_file(self, file: str) -> tuple[Headers, Rows]:
-        with open(file) as f:
-            self.cur.execute(f.read())
-
-        return (
-            [c[0] for c in self.cur.description],
-            self.cur.fetchall()
-        )
-
-    def update(self):
-        os.makedirs(self.db_dir, exist_ok=True)
-        os.chdir(self.db_dir)
-        
-        if os.path.exists(self.db_file):
-            os.remove(self.db_file) 
-
-        print(f"Downloading database: {DB_SOURCE}...")
-
-        try:
-            with urlopen(DB_SOURCE) as remote, open(DB_ZIP_NAME, "wb") as local:
-                local.write(remote.read())
-
-        except Exception as e:
-            sys.stderr.write(f"Error while downloading: {e}\n")
-
-        print(f"Extracting {DB_ZIP_NAME}...")
-
-        try:
-            with ZipFile(DB_ZIP_NAME) as z:
-                z.extractall()
-        except Exception as e:
-            sys.stderr.write(f"Error while extracting: {e}\n")
-
-        os.remove(DB_ZIP_NAME)
-        print("Database was installed successfully!")
-
-    def execute(self, sql: str, params: Opt[Iterable]) -> Rows:
-        self.cur.execute(sql, params)
-        return self.cur.fetchall()
 
 class Fetcher:
     def __init__(self):
@@ -110,6 +25,11 @@ class Fetcher:
         cur = self.db.con.cursor()
         cur.row_factory = dict_row_factory
         return self.db.run_script(script, self.params, overwrite_cursor=cur)
+
+    def _get_raw_sql(self, sql: str, params: Opt[Iterable]) -> tuple[Headers, Opt[Rows]]:
+        rows = self.db.execute(sql, params)
+        headers = [c[0] for c in self.db.cur.description]
+        return headers, rows
 
     def row_to_dict(self, row: Row, headers: Headers) -> Opt[dict]:
         if not headers:
@@ -216,3 +136,34 @@ class Driver(Fetcher):
     def get_pits(self) -> tuple[Headers, Opt[Rows]]:
         return self.db.run_script("driver/pits", self.params)
 
+class Raw(Fetcher):
+    def __init__(self):
+        super().__init__()
+
+    def get(self, sql: str, params: Opt[Iterable]):
+        return self._get_raw_sql(sql, params)
+
+class Misc(Fetcher):
+    def __init__(self):
+        super().__init__()
+
+    def get_gps(self, year: Opt[int]):
+        sql = """
+            SELECT 
+                grand_prix.id, 
+                grand_prix.abbreviation 
+            FROM grand_prix 
+            JOIN race on race.year = ? 
+            WHERE race.grand_prix_id = grand_prix.id
+        """
+
+        if not year:
+            year = Today().year()
+        
+        return self._get_raw_sql(sql, [year])
+
+    def get_season_gps(self, year: Opt[int]):
+        if not year:
+            year = Today().year()
+
+        return self.db.run_script("season", {"year": year})

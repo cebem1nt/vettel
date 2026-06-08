@@ -2,8 +2,6 @@ import os, sys
 
 from typing import Iterable, Optional, Tuple, Any
 from statistics import mean, stdev, median, median_low, median_high, mode
-from urllib.request import urlopen
-from zipfile import ZipFile
 
 from collections import defaultdict
 from itertools import islice
@@ -17,6 +15,7 @@ from vettel.helpers import (
 )
 
 from vettel import fetchers
+from vettel.database import F1DB
 
 from vettel.tables import Table
 from vettel.emoji import gp_flags, get_ioc_flag
@@ -24,6 +23,52 @@ from vettel.emoji import gp_flags, get_ioc_flag
 class Handler:
     def __init__(self, table: Table):
         self.table = table
+
+class DB:
+    def __init__(
+        self, 
+        out_table: Table
+    ):
+        self.db = F1DB()
+        self.table = out_table
+
+    def update(self):
+        self.db.update()
+
+    def execute_sql(self, file: str):
+        try:
+            self.table.rows, self.table.headers = self.db.run_file(file)
+            self.table.flush()
+
+        except FileNotFoundError:
+            return print(f'File "{file}" does not exist')
+    
+    def search(
+        self, 
+        part: str, 
+        table: str, 
+        column: str,
+        overwrite_pattern=False
+    ):
+        pattern = part if overwrite_pattern else f"%{part}%"
+
+        fetched = self.db.execute(
+            f"SELECT * FROM {table} WHERE {table}.{column} LIKE ?"
+        , [pattern])
+
+        headers = []
+        name_index = 0
+
+        for i, c in enumerate(self.db.cur.description):
+            headers.append(c[0])
+            if c[0] == "name": 
+                name_index = i
+
+        for found in fetched:
+            print(f"\n---- Found: {found[name_index]} ----\n")
+
+            for i in range(len(headers)):
+                print(f"{headers[i]}: {found[i]}")
 
 class Race(Handler):
     def __init__(
@@ -211,9 +256,6 @@ class Driver(Handler):
     ):
         super().__init__(table)
         self.id = id
-
-        if not year:
-            year = Date("today").year()
 
         self.fetcher = fetchers.Driver(id, year)
         self.year = year
@@ -542,27 +584,15 @@ class Season(Handler):
         self, 
         year: int,
         add_gp_flags: bool,
-        db: F1DB,
         table: Table
     ):
-        super().__init__(db, table)
+        super().__init__(table)
         self.year = year
-        if not self.year:
-            self.year = Date("today").year()
-
         self.add_gp_flags = add_gp_flags
 
-    def championship(self, is_constructor=False):
-        gp_info_sql = """
-            SELECT 
-                grand_prix.id, 
-                grand_prix.abbreviation 
-            FROM grand_prix 
-            JOIN race on race.year = ? 
-            WHERE race.grand_prix_id = grand_prix.id
-        """
-
-        rows = self.db.execute(gp_info_sql, [self.year])
+    def championship(self, is_constructor: bool = False):
+        fetcher = fetchers.Misc()
+        _, rows = fetcher.get_gps(self.year)
 
         grandprix_cols = []
         grandprix_template = {}
@@ -577,7 +607,7 @@ class Season(Handler):
             grandprix_cols.append(abbr)
             grandprix_template[abbr] = None
 
-        rows = self.db.run_script("season", {"year": self.year})
+        _, rows = fetcher.get_season_gps(self.year)
 
         drivers_results = defaultdict(lambda: dict(grandprix_template))
         teams_drivers = defaultdict(dict)
@@ -682,53 +712,6 @@ class Circuit(Handler):
         print(f"Type: {circuit_type.lower()}\n")
         print("Coordinates: ")
         print(f"{lat},{lon}\n")
-
-class DB:
-    def __init__(
-        self, 
-        db_handler: F1DB,
-        out_table: Table
-    ):
-        self.db = db_handler
-        self.table = out_table
-
-    def update(self):
-        self.db.update()
-
-    def execute_sql(self, file: str):
-        try:
-            self.table.rows, self.table.headers = self.db.run_file(file)
-            self.table.flush()
-
-        except FileNotFoundError:
-            return print(f'File "{file}" does not exist')
-    
-    def search(
-        self, 
-        part: str, 
-        table: str, 
-        column: str,
-        overwrite_pattern=False
-    ):
-        pattern = part if overwrite_pattern else f"%{part}%"
-
-        fetched = self.db.execute(
-            f"SELECT * FROM {table} WHERE {table}.{column} LIKE ?"
-        , [pattern])
-
-        headers = []
-        name_index = 0
-
-        for i, c in enumerate(self.db.cur.description):
-            headers.append(c[0])
-            if c[0] == "name": 
-                name_index = i
-
-        for found in fetched:
-            print(f"\n---- Found: {found[name_index]} ----\n")
-
-            for i in range(len(headers)):
-                print(f"{headers[i]}: {found[i]}")
 
 class Calendar:
     def __init__(
