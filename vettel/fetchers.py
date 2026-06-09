@@ -61,24 +61,24 @@ class Sprint(Fetcher):
         self.params = {"id": id, "year": year}
 
     def get(self) -> tuple[Headers, Opt[Rows]]:
-        return DB.run_script("sprint", self.params)
+        return DB.run_script("sprint/sprint", self.params)
 
     def get_as_dict(self) -> tuple[Headers, Opt[DictRows]]:
-        return self._db_get_as_dict("sprint", self.params)
+        return self._db_get_as_dict("sprint/sprint", self.params)
 
     def get_quali(self) -> tuple[Headers, Opt[Rows]]:
-        return DB.run_script("sprint-qualifying", self.params)
+        return DB.run_script("sprint/qualifying", self.params)
 
     def get_quali_as_dict(self) -> tuple[Headers, Opt[DictRows]]:
-        return self._db_get_as_dict("sprint-qualifying", self.params)
+        return self._db_get_as_dict("sprint/qualifying", self.params)
 
 class Results(Fetcher):
     def __init__(self, year: int, is_quali: bool):
         super().__init__()
         self.year = year
         self.params = [year]
-        self.script = "qualifying-results" if is_quali else \
-                      "results"
+        self.script = "results/qualifying" if is_quali else \
+                      "results/results"
 
     def get(self) -> tuple[Headers, Opt[Rows]]:
         return DB.run_script(self.script, self.params)
