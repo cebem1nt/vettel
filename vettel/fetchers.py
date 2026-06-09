@@ -2,8 +2,8 @@ from sqlite3 import Row, Cursor
 
 from typing import List, Optional, Iterable
 
-from .helpers import Today
-from .database import DB
+from vettel.helpers import Today
+from vettel.database import DB
 
 # My attempt on saving ugly bulky python types
 Headers = List[str]
@@ -157,3 +157,9 @@ class Misc(Fetcher):
         """
 
         return self._get_raw_sql(sql, {"id": id})
+
+    def get_standings(self, year: int, is_constructor: bool):
+        script = "standings/constructor" if is_constructor else \
+                 "standings/standings"
+
+        return DB.run_script(script, {"year": year})

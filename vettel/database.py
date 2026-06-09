@@ -1,4 +1,7 @@
-import os, sqlite3, sys
+import os, sys
+
+from sqlite3 import connect as sql_connect, Row, Cursor
+from typing import Iterable, Optional as Opt, List
 
 from urllib.request import urlopen
 from zipfile import ZipFile
@@ -24,7 +27,7 @@ class F1DB:
             self.update()
             exit(0)
 
-        self.con = sqlite3.connect(self.db_file)
+        self.con = sql_connect(self.db_file)
         self.cur = self.con.cursor()
 
     def run_script(
@@ -33,7 +36,7 @@ class F1DB:
         params: Iterable = [],
         extra_sql: Opt[str] = None,
         overwrite_cursor: Opt[Cursor] = None
-    ) -> tuple[Headers, Opt[Rows]]:
+    ) -> tuple[Headers, List[Row]]:
         script = os.path.join(self.sql_scripts_dir, name + ".sql")
 
         cur = overwrite_cursor if overwrite_cursor else \
@@ -48,7 +51,7 @@ class F1DB:
         cur.execute(sql, params)
         return [c[0] for c in cur.description], cur.fetchall()
 
-    def run_file(self, file: str) -> tuple[Headers, Rows]:
+    def run_file(self, file: str) -> tuple[Headers, List[Row]]:
         with open(file) as f:
             self.cur.execute(f.read())
 
@@ -84,7 +87,7 @@ class F1DB:
         os.remove(DB_ZIP_NAME)
         print("Database was installed successfully!")
 
-    def execute(self, sql: str, params: Opt[Iterable]) -> Rows:
+    def execute(self, sql: str, params: Opt[Iterable]) -> List[Row]:
         self.cur.execute(sql, params)
         return self.cur.fetchall()
 

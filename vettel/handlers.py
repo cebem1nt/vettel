@@ -4,7 +4,7 @@ from statistics import mean, stdev, median, median_low, median_high, mode
 from collections import defaultdict
 from itertools import islice
 
-from .helpers import (
+from vettel.helpers import (
     strsign, annotate_pf,
     ifnone, separator, 
     print_comments,
@@ -12,11 +12,11 @@ from .helpers import (
     format_date, Today
 )
 
-from . import fetchers
-from .database import DB
+from vettel import fetchers
+from vettel.database import DB
 
-from .tables import Table
-from .emoji import gp_flags, get_ioc_flag
+from vettel.tables import Table
+from vettel.emoji import gp_flags, get_ioc_flag
 
 Opt = Optional
 
@@ -764,10 +764,7 @@ class Standings:
         self.table.hide_delimiters = True
 
     def standings(self, is_constructor: bool = False, show_flags: bool = False):
-        script = "standings/constructor" if is_constructor else \
-                 "standings/standings"
-        
-        headers, rows = self.fetcher.raw_script(script, {"year": self.year})
+        headers, rows = self.fetcher.get_standings(self.year, is_constructor)
 
         if not rows:
             return print(f"No standings found for: {self.year}")
