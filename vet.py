@@ -2,6 +2,7 @@
 import os, argparse, sys
 
 from vettel.tables import Table
+from vettel.helpers import Today
 from vettel.handlers import (
     DB,
     Race,
@@ -14,6 +15,7 @@ from vettel.handlers import (
 )
 
 VERSION = "1.3.0"
+CURRENT_YEAR = Today().year()
 
 def match_args(args: argparse.Namespace):
     table = Table(
@@ -128,7 +130,7 @@ def main():
 
     driver_p = subps.add_parser("driver", help="Different driver's statistics, data over the season or all time")
     driver_p.add_argument      ("id",  metavar="ID",        type=str,            help="Driver id")
-    driver_p.add_argument      ("year",metavar="YEAR",      type=int, nargs="?", help="Optional season year. Current year if omitted")
+    driver_p.add_argument      ("year",metavar="YEAR",      type=int, nargs="?", default=CURRENT_YEAR, help="Optional season year. Current year if omitted")
     driver_p.add_argument      ("-o",  "--overview",        action="store_true", help="An overview, driver statistics for a season")
     driver_p.add_argument      ("-r",  "--races",           action="store_true", help="Driver race results for given season")
     driver_p.add_argument      ("-s",  "--sprints",         action="store_true", help="Driver season sprints results")
@@ -138,30 +140,30 @@ def main():
     
     race_p = subps.add_parser("race", help="Show exact/all races results for given year")
     race_p.add_argument      ("id",   metavar="ID",      type=str, nargs="?", help="Grand prix or circuit id, e.g: monaco/china, shanghai")
-    race_p.add_argument      ("year", metavar="YEAR",    type=int, nargs="?", help="Year of the race. Current year if omitted")
+    race_p.add_argument      ("year", metavar="YEAR",    type=int, nargs="?", default=CURRENT_YEAR, help="Year of the race. Current year if omitted")
     race_p.add_argument      ("-f", "--full",            action="store_true", help="Show full information table")
     race_p.add_argument      ("-q", "--qualifying",      action="store_true", help="Show the qualifying result instead")
     race_p.add_argument      ("-r", "--results",         action="store_true", help="Show races results for the given year")
 
 
     sprint_p = subps.add_parser("sprint", help="Sprint results")
-    sprint_p.add_argument      ("id",   metavar="ID",   type=str,             help="Grand prix or circuit id, e.g: monaco/china, shanghai")
-    sprint_p.add_argument      ("year", metavar="YEAR", type=int, nargs="?",  help="Year of the sprint. Current year if omitted")
-    sprint_p.add_argument      ("-f", "--full",         action="store_true",  help="Show full information table")
-    sprint_p.add_argument      ("-q", "--qualifying",   action="store_true",  help="Show the qualifying result instead")
+    sprint_p.add_argument      ("id",   metavar="ID",   type=str,            help="Grand prix or circuit id, e.g: monaco/china, shanghai")
+    sprint_p.add_argument      ("year", metavar="YEAR", type=int, nargs="?", default=CURRENT_YEAR, help="Year of the sprint. Current year if omitted")
+    sprint_p.add_argument      ("-f", "--full",         action="store_true", help="Show full information table")
+    sprint_p.add_argument      ("-q", "--qualifying",   action="store_true", help="Show the qualifying result instead")
 
     standings_p = subps.add_parser("standings", help="Season driver standings")
-    standings_p.add_argument      ("year", metavar="YEAR", type=int, nargs="?",  help="Season year. Current year if omitted")
+    standings_p.add_argument      ("year", metavar="YEAR", type=int, nargs="?",  default=CURRENT_YEAR,  help="Season year. Current year if omitted")
     standings_p.add_argument      ("-c", "--constructor",  action="store_true",  help="Show constructor standings instead")
     standings_p.add_argument      ("--flags",              action="store_true",  help="Add emoji flags to driver's nationality")
 
     season_p = subps.add_parser("season", help="Fancy wikipedia like season table for driver/constructor championship")
-    season_p.add_argument      ("year", metavar="YEAR", type=int, nargs="?", help="Season year. Current year if omitted")
+    season_p.add_argument      ("year", metavar="YEAR", type=int, nargs="?", default=CURRENT_YEAR, help="Season year. Current year if omitted")
     season_p.add_argument      ("-c", "--constructor",  action="store_true", help="Show constructor table instead")
     season_p.add_argument      ("--flags",              action="store_true", help="Add emoji flags to grand prix columns")
 
     calendar_p = subps.add_parser("calendar", help="Dates/calendar for a given season")
-    calendar_p.add_argument      ("year", metavar="YEAR", type=int, nargs="?", help="Season year. Current year if omitted")
+    calendar_p.add_argument      ("year", metavar="YEAR", type=int, nargs="?", default=CURRENT_YEAR, help="Season year. Current year if omitted")
     calendar_p.add_argument      ("-f", "--full", action="store_true",         help="Show full calendar, do not stop at current stage")
 
     # TODO perhaps split search into a sub-parser?

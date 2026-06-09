@@ -22,6 +22,7 @@ class F1DB:
         if not os.path.exists(self.db_file):
             print("No database found, installing...")
             self.update()
+            exit(0)
 
         self.con = sqlite3.connect(self.db_file)
         self.cur = self.con.cursor()
@@ -86,3 +87,5 @@ class F1DB:
     def execute(self, sql: str, params: Opt[Iterable]) -> Rows:
         self.cur.execute(sql, params)
         return self.cur.fetchall()
+
+DB = F1DB()

@@ -4,7 +4,7 @@ from statistics import mean, stdev, median, median_low, median_high, mode
 from collections import defaultdict
 from itertools import islice
 
-from vettel.helpers import (
+from .helpers import (
     strsign, annotate_pf,
     ifnone, separator, 
     print_comments,
@@ -12,28 +12,24 @@ from vettel.helpers import (
     format_date, Today
 )
 
-from vettel import fetchers
-from vettel.database import F1DB
+from . import fetchers
+from .database import DB
 
-from vettel.tables import Table
-from vettel.emoji import gp_flags, get_ioc_flag
+from .tables import Table
+from .emoji import gp_flags, get_ioc_flag
 
 Opt = Optional
 
 class DB:
-    def __init__(
-        self, 
-        out_table: Table
-    ):
-        self.db = F1DB()
+    def __init__(self, out_table: Table):
         self.table = out_table
 
     def update(self):
-        self.db.update()
+        DB.update()
 
     def execute_sql(self, file: str):
         try:
-            self.table.rows, self.table.headers = self.db.run_file(file)
+            self.table.rows, self.table.headers = DB.run_file(file)
             self.table.flush()
 
         except FileNotFoundError:
@@ -48,14 +44,14 @@ class DB:
     ):
         pattern = part if overwrite_pattern else f"%{part}%"
 
-        fetched = self.db.execute(
+        fetched = DB.execute(
             f"SELECT * FROM {table} WHERE {table}.{column} LIKE ?"
         , [pattern])
 
         headers = []
         name_index = 0
 
-        for i, c in enumerate(self.db.cur.description):
+        for i, c in enumerate(DB.cur.description):
             headers.append(c[0])
             if c[0] == "name": 
                 name_index = i
@@ -659,7 +655,7 @@ class Circuit:
         self.fetcher = fetchers.Misc() 
 
     def record(self, script: str):
-        self.table.headers, fetched = self.fetcher.get_raw_script(f"circuit/{script}", [self.id])
+        self.table.headers, fetched = self.fetcher.raw_script(f"circuit/{script}", [self.id])
 
         if self.rows != -1:
             fetched = fetched[:self.rows]
@@ -706,7 +702,7 @@ class Calendar:
         fetcher = fetchers.Misc()
         _, rows = fetcher.get_calendar(self.year)
         
-        today = Date("today") 
+        today = Today()
         is_current_found = False
         separator_width = 35
 
@@ -756,14 +752,11 @@ class Calendar:
 class Standings:
     def __init__(
         self,
-        year: Opt[int],
+        year: int,
         table: Table,
         is_full: bool = False
     ):
         self.table = table
-        if not year:
-            year = Today().year()
-
         self.year = year
         self.is_full = is_full
 
@@ -774,7 +767,7 @@ class Standings:
         script = "standings/constructor" if is_constructor else \
                  "standings/standings"
         
-        headers, rows = self.fetcher.get_raw_script(script, {"year": self.year})
+        headers, rows = self.fetcher.raw_script(script, {"year": self.year})
 
         if not rows:
             return print(f"No standings found for: {self.year}")
