@@ -74,13 +74,12 @@ class Race:
         self.is_full = is_full
         self.id = id
         self.year = year
-        self.fetcher = fetchers.Race(id, year)
 
         if not self.is_full:
             self.table.hide_delimiters = True
 
     def race(self):
-        headers, rows = self.fetcher.get()
+        headers, rows = fetchers.race(self.id, self.year)
 
         if not rows:
             return print(f"No race found: {self.id} - {self.year}")
@@ -125,8 +124,7 @@ class Race:
             print_comments(dnf_comments)
 
     def qualifying(self):
-        headers, rows = self.fetcher.get_quali() if self.is_full else \
-                        self.fetcher.get_quali_as_dict()
+        headers, rows = fetchers.qualifying(self.id, self.year, as_dict=not self.is_full)
 
         if not rows:
             return print(f"No race qualifying found: {self.id} - {self.year}")
@@ -145,8 +143,7 @@ class Race:
         self.table.flush()
 
     def results(self, is_quali: bool, is_utc: bool):
-        fetcher = fetchers.Results(self.year, is_quali)
-        self.table.headers, rows = fetcher.get()
+        self.table.headers, rows = fetchers.race_results(self.year, is_quali)
         
         if not rows:
             return print(f"No races found for: {self.year}")
@@ -175,13 +172,12 @@ class Sprint:
         self.id = id
         self.year = year
         self.is_full = is_full
-        self.fetcher = fetchers.Sprint(id, year)
 
         if not self.is_full:
             self.table.hide_delimiters = True
 
     def sprint(self):
-        headers, rows = self.fetcher.get() 
+        headers, rows = fetchers.sprint(self.id, self.year) 
         if not rows:
             return print(f"No sprint found: {self.id} - {self.year}")
 
@@ -219,8 +215,7 @@ class Sprint:
             print_comments(dnf_comments)
 
     def qualifying(self):
-        headers, rows = self.fetcher.get_quali() if self.is_full else \
-                        self.fetcher.get_quali_as_dict()
+        headers, rows = fetchers.sprint_qualifying(self.id, self.year, as_dict=not self.is_full)
 
         if not rows:
             return print(f"No sprint qualifying found: {self.id} - {self.year}")
@@ -246,15 +241,13 @@ class Driver:
         table: Table,
         is_all_time: bool = False
     ):
-        self.table = table
         self.id = id
-
-        self.fetcher = fetchers.Driver(id, year)
         self.year = year
+        self.table = table
         self.is_all_time = is_all_time
 
     def races(self):
-        headers, rows = self.fetcher.get_races(self.is_all_time)
+        headers, rows = fetchers.driver_races(self.id, self.year, self.is_all_time)
 
         comments = []
         dnf_comments = []
@@ -297,18 +290,14 @@ class Driver:
             print_comments(dnf_comments)
 
     def pits(self):
-        _, rows = self.fetcher.get_pits()
+        _, rows = fetchers.driver_pits(self.id, self.year, as_dict=True)
         races_pits = defaultdict(list)
         most_pits = -1
 
-        for _, race, lap, time in rows:
-            pit = {
-                "lap": lap,
-                "time": time
-            }
-
-            races_pits[race].append(pit)
-            total_pits = len(races_pits[race])
+        for pit in rows:
+            gp = pit["GP"]
+            races_pits[gp].append(pit)
+            total_pits = len(races_pits[gp])
 
             if total_pits > most_pits:
                 most_pits = total_pits
@@ -325,7 +314,7 @@ class Driver:
                     continue
 
                 pit = pits[i]
-                row.append(f"lap {pit["lap"]} - {pit["time"]}")
+                row.append(f"lap {pit["Lap"]} - {pit["Time"]}")
                 total_pits += 1
 
             row.append(total_pits)
@@ -334,15 +323,15 @@ class Driver:
         self.table.flush()
 
     def qualifying(self):
-        self.table.headers, self.table.rows = self.fetcher.get_qualifying(self.is_all_time)
+        self.table.headers, self.table.rows = fetchers.driver_qualifying(self.id, self.year, self.is_all_time)
         self.table.flush()
 
     def sprints(self):
-        self.table.headers, self.table.rows = self.fetcher.get_sprints(self.is_all_time)
+        self.table.headers, self.table.rows = fetchers.driver_sprints(self.id, self.year, self.is_all_time)
         self.table.flush()
 
     def overview(self):
-        _, rows = self.fetcher.get_overview(self.is_all_time)
+        _, rows = fetchers.driver_overview(self.id, self.year, self.is_all_time)
     
         if not rows:
             return print(f"No data found for {self.id} - {self.year}")
@@ -482,15 +471,15 @@ class Driver:
 
         points_share = total["pts"] / total["team_pts"]
 
-        _, rows = self.fetcher.get_pits()
+        _, rows = fetchers.driver_pits(self.id, self.year)
         
         pit_times = []
         problematic_pits = 0
         avg_pit_time = 0
 
-        for row in rows:
-            if not row[0]: continue
-            pit_times.append(row[0] / 1000)
+        for ms, *_ in rows:
+            if not ms: continue
+            pit_times.append(ms / 1000)
 
         if pit_times:
             pit_times.sort()
@@ -583,8 +572,7 @@ class Season:
         self.add_gp_flags = add_gp_flags
 
     def championship(self, is_constructor: bool = False):
-        fetcher = fetchers.Misc()
-        _, rows = fetcher.get_gps(self.year)
+        _, rows = fetchers.gps(self.year)
 
         grandprix_cols = []
         grandprix_template = {}
@@ -599,7 +587,7 @@ class Season:
             grandprix_cols.append(abbr)
             grandprix_template[abbr] = None
 
-        _, rows = fetcher.get_season_gps(self.year)
+        _, rows = fetchers.season_gps(self.year)
 
         drivers_results = defaultdict(lambda: dict(grandprix_template))
         teams_drivers = defaultdict(dict)
@@ -652,10 +640,9 @@ class Circuit:
         self.id = id
         self.rows = rows
         self.is_reversed = is_reversed
-        self.fetcher = fetchers.Misc() 
 
     def record(self, script: str):
-        self.table.headers, fetched = self.fetcher.raw_script(f"circuit/{script}", [self.id])
+        self.table.headers, fetched = fetchers.raw_script(f"circuit/{script}", [self.id])
 
         if self.rows != -1:
             fetched = fetched[:self.rows]
@@ -667,7 +654,7 @@ class Circuit:
         self.table.flush()
 
     def info(self, years_per_row=8):
-        _, rows = self.fetcher.get_circuit_info(self.id)
+        _, rows = fetchers.circuit_info(self.id)
 
         if not rows:
             return print(f"Circuit: \"{self.id}\" was not found")
@@ -699,8 +686,7 @@ class Calendar:
         self.year = year
 
     def calendar(self, show_full: bool = False, is_utc: bool = False):
-        fetcher = fetchers.Misc()
-        _, rows = fetcher.get_calendar(self.year)
+        _, rows = fetchers.calendar(self.year)
         
         today = Today()
         is_current_found = False
@@ -760,11 +746,10 @@ class Standings:
         self.year = year
         self.is_full = is_full
 
-        self.fetcher = fetchers.Misc()
         self.table.hide_delimiters = True
 
     def standings(self, is_constructor: bool = False, show_flags: bool = False):
-        headers, rows = self.fetcher.get_standings(self.year, is_constructor)
+        headers, rows = fetchers.standings(self.year, is_constructor)
 
         if not rows:
             return print(f"No standings found for: {self.year}")
