@@ -142,6 +142,20 @@ class Race:
 
         self.table.flush()
 
+class Results:
+    def __init__(
+        self, 
+        year: int, 
+        table: Table, 
+        is_full: bool = False
+    ):
+        self.table = table
+        self.year = year
+        self.is_full = is_full
+
+        if not is_full:
+            self.table.hide_delimiters = True
+
     def results(self, is_quali: bool):
         self.table.headers, rows = fetchers.race_results(self.year, is_quali)
         
@@ -718,8 +732,10 @@ class Calendar:
                 round_string = "-*- " + round_string + " -*-"
             
             print(round_string.center(separator_width + 2))
-            if show_circuit:
+            
+            if show_circuit: 
                 print(f"Circuit: {circuit}".center(separator_width + 2))
+            
             print("  " + separator(separator_width))
 
             if sprint_date:

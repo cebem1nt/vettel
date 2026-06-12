@@ -12,6 +12,7 @@ from vettel.handlers import (
     Circuit,
     Calendar,
     Standings,
+    Results
 )
 
 VERSION = "1.3.0"
@@ -59,12 +60,14 @@ def match_args(args: argparse.Namespace):
             calendar = Calendar(args.year)
             calendar.calendar(args.full, args.utc, args.circuit, args.rounds_ahead)
 
+        case "results":
+            results = Results(args.year, table, args.full)
+            results.results(args.qualifying)
+
         case "race":
             race = Race(args.id, args.year, table, args.full)
 
-            if args.results:
-                race.results(args.qualifying)
-            elif args.qualifying:
+            if args.qualifying:
                 race.qualifying()
             else:
                 race.race()
@@ -137,13 +140,16 @@ def main():
     driver_p.add_argument      ("-p",  "--pit-stops",       action="store_true", help="Table of pit stops for each race")
     driver_p.add_argument      ("-a",  "--all-time",        action="store_true", help="Show all time results instead")
     
-    race_p = subps.add_parser("race", help="Show exact/all races results for given year")
-    race_p.add_argument      ("id",   metavar="ID",      type=str, nargs="?", help="Grand prix or circuit id, e.g: monaco/china, shanghai")
+    race_p = subps.add_parser("race", help="Show exact race result for given year")
+    race_p.add_argument      ("id",   metavar="ID",      type=str,            help="Grand prix or circuit id, e.g: monaco/china, shanghai")
     race_p.add_argument      ("year", metavar="YEAR",    type=int, nargs="?", default=CURRENT_YEAR, help="Year of the race. Current year if omitted")
     race_p.add_argument      ("-f", "--full",            action="store_true", help="Show full information table")
     race_p.add_argument      ("-q", "--qualifying",      action="store_true", help="Show the qualifying result instead")
-    # race_p.add_argument      ("-r", "--results",         action="store_true", help="Show races results for the given year")
-    # TODO results to a separate parser
+
+    results_p = subps.add_parser("results", help="Show results for all races/quali for given year")
+    results_p.add_argument      ("year",metavar="YEAR", type=int,            help="Season year. Current year if omitted")
+    results_p.add_argument      ("-f",  "--full",       action="store_true", help="Show full information table")
+    results_p.add_argument      ("-q",  "--qualifying", action="store_true", help="Show qualifying results instead")
 
     sprint_p = subps.add_parser("sprint", help="Sprint results")
     sprint_p.add_argument      ("id",   metavar="ID",   type=str,            help="Grand prix or circuit id, e.g: monaco/china, shanghai")
