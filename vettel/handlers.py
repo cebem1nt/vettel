@@ -685,7 +685,7 @@ class Calendar:
     def __init__(self, year: int):
         self.year = year
 
-    def calendar(self, show_full: bool, is_utc: bool, show_circuit: bool):
+    def calendar(self, show_full: bool, is_utc: bool, show_circuit: bool, rounds_ahead: int = 0):
         _, rows = fetchers.calendar(self.year)
         
         today = Today()
@@ -733,7 +733,11 @@ class Calendar:
             print(f"  - Race:              {race.date(as_local)} at {race.time(as_local, time_fmt)}")
             print()
 
-            if not show_full and is_current_stage:
+            if not show_full and is_current_found:
+                if rounds_ahead > 0:
+                    rounds_ahead -= 1
+                    continue
+
                 print("....".center(separator_width))
                 print()
                 break

@@ -57,7 +57,7 @@ def match_args(args: argparse.Namespace):
 
         case "calendar":
             calendar = Calendar(args.year)
-            calendar.calendar(args.full, args.utc, args.circuit)
+            calendar.calendar(args.full, args.utc, args.circuit, args.rounds_ahead)
 
         case "race":
             race = Race(args.id, args.year, table, args.full)
@@ -162,11 +162,11 @@ def main():
     season_p.add_argument      ("--flags",              action="store_true", help="Add emoji flags to grand prix columns")
 
     calendar_p = subps.add_parser("calendar", help="Dates/calendar for a given season")
-    calendar_p.add_argument      ("year",metavar="YEAR", type=int, nargs="?", default=CURRENT_YEAR, help="Season year. Current year if omitted")
-    calendar_p.add_argument      ("-f",  "--full",       action="store_true", help="Show full calendar, do not stop at current stage")
-    calendar_p.add_argument      ("-c",  "--circuit",    action="store_true", help="Show circuit name for each round")
-    calendar_p.add_argument      ("-r",  "--rounds",     type=str,            help="Rounds offset as signed number. For example +2 will show untill next two rounds")
-    calendar_p.add_argument      ("--utc",               action="store_true", help="Show time in utc timezone instead")
+    calendar_p.add_argument      ("year",metavar="YEAR",  type=int, nargs="?", default=CURRENT_YEAR, help="Season year. Current year if omitted")
+    calendar_p.add_argument      ("-f",  "--full",        action="store_true", help="Show full calendar, do not stop at current stage")
+    calendar_p.add_argument      ("-c",  "--circuit",     action="store_true", help="Show circuit name for each round")
+    calendar_p.add_argument      ("-r",  "--rounds-ahead",type=int, default=0, help="How much more rounds to show after the current one")
+    calendar_p.add_argument      ("--utc",                action="store_true", help="Show time in utc timezone instead")
 
     # TODO perhaps split search into a sub-parser?
     db_p = subps.add_parser("db", help="Different database related commands")
