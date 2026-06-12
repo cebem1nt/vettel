@@ -142,7 +142,7 @@ class Race:
 
         self.table.flush()
 
-    def results(self, is_quali: bool, is_utc: bool):
+    def results(self, is_quali: bool):
         self.table.headers, rows = fetchers.race_results(self.year, is_quali)
         
         if not rows:
@@ -155,7 +155,7 @@ class Race:
             if not self.is_full:
                 row = row[:4]
 
-            date_formatted = format_date(gp_date, not is_utc)
+            date_formatted = format_date(gp_date)
             self.table.rows.append([date_formatted] + row)
         
         self.table.flush()
@@ -685,23 +685,24 @@ class Calendar:
     def __init__(self, year: int):
         self.year = year
 
-    def calendar(self, show_full: bool = False, is_utc: bool = False):
+    def calendar(self, show_full: bool, is_utc: bool, show_circuit: bool):
         _, rows = fetchers.calendar(self.year)
         
         today = Today()
         is_current_found = False
-        separator_width = 35
-
+        as_local = not is_utc
         time_fmt = "%H:%M"
+        separator_width = 36
+
         if is_utc:
             time_fmt += " %Z"
+            separator_width += 4
 
-        as_local = not is_utc
-
-        for rnd, gp, race_date, race_time, \
-                     sprint_date, sprint_time, \
-                     quali_date, quali_time, \
-                     sprint_quali_date, sprint_quali_time in rows:
+        for rnd, gp, circuit, \
+                race_date, race_time, \
+                sprint_date, sprint_time, \
+                quali_date, quali_time, \
+                sprint_quali_date, sprint_quali_time in rows:
 
             is_current_stage = False
 
@@ -712,22 +713,24 @@ class Calendar:
                 is_current_stage = True
                 is_current_found = True
 
-            round_string = f"Round {rnd} - {gp}"
+            round_string = f"R{rnd} - {gp}"
             if is_current_stage:
                 round_string = "-*- " + round_string + " -*-"
             
             print(round_string.center(separator_width + 2))
+            if show_circuit:
+                print(f"Circuit: {circuit}".center(separator_width + 2))
             print("  " + separator(separator_width))
 
             if sprint_date:
                 sprint = Date(sprint_date, sprint_time)
                 sprint_quali = Date(sprint_quali_date, sprint_quali_time)
 
-                print(f"  - Sprint qualifying: {sprint_quali.date(as_local=as_local)} at {sprint_quali.time(time_fmt, as_local)}")
-                print(f"  - Sprint:            {sprint.date(as_local=as_local)} at {sprint.time(time_fmt, as_local)}")
+                print(f"  - Sprint qualifying: {sprint_quali.date(as_local)} at {sprint_quali.time(as_local, time_fmt)}")
+                print(f"  - Sprint:            {sprint.date(as_local)} at {sprint.time(as_local, time_fmt)}")
 
-            print(f"  - Qualifying:        {quali.date(as_local=as_local)} at {quali.time(time_fmt, as_local)}")
-            print(f"  - Race:              {race.date(as_local=as_local)} at {race.time(time_fmt, as_local)}")
+            print(f"  - Qualifying:        {quali.date(as_local)} at {quali.time(as_local, time_fmt)}")
+            print(f"  - Race:              {race.date(as_local)} at {race.time(as_local, time_fmt)}")
             print()
 
             if not show_full and is_current_stage:

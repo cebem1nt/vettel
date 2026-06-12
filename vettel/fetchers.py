@@ -1,15 +1,8 @@
 from sqlite3 import Row, Cursor
-
-from typing import List, Optional, Iterable
+from typing import List, Optional as Opt, Iterable
 
 from vettel.helpers import Today
 from vettel.database import DB
-
-# My attempt on saving ugly bulky python types
-Headers = List[str]
-Rows = List[Row]
-DictRows = List[dict]
-Opt = Optional
 
 def __dict_row_factory(cursor: Cursor, row: Row):
     return {col[0]: row[idx] for idx, col in enumerate(cursor.description)}

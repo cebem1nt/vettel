@@ -35,7 +35,7 @@ class Streak:
 class Date:
     """
     Class to manage UTC dates.
-    Takes in ISO formatted dates, times
+    Takes in ISO formatted date and optionally time
     """
     def __init__(
         self, 
@@ -61,18 +61,18 @@ class Date:
 
         self._combined = datetime.combine(com_date, com_time, tz.utc)
 
-    def date(self, fmt: str = "%b %d", as_local = True) -> str:
+    def date(self, as_local = True, fmt: str = "%b %d", fallback: str = "???") -> str:
         if self._date is None:
-            return "???"
+            return fallback
 
         interm = self._combined.astimezone() if as_local else \
                  self._combined
 
         return datetime.strftime(interm, fmt)
 
-    def time(self, fmt: str = "%H:%M", as_local = True) -> str:
+    def time(self, as_local = True, fmt: str = "%H:%M", fallback: str = "???") -> str:
         if self._time is None:
-            return "???"
+            return fallback
         
         interm = self._combined.astimezone() if as_local else \
                  self._combined
@@ -118,5 +118,5 @@ def separator(width=50):
 def print_comments(comments: list[str]):
     print('\n'.join(comments), end="\n\n")
 
-def format_date(date: str, is_local: bool):
+def format_date(date: str, is_local: bool = True):
     return Date(date).date(as_local=is_local)
