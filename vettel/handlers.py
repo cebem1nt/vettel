@@ -696,23 +696,26 @@ class Circuit:
         print(f"{lat},{lon}\n")
 
 class Calendar:
-    def __init__(self, year: int):
+    def __init__(self, year: int, is_utc: bool):
         self.year = year
+        self.as_local = not is_utc
 
-    def calendar(self, show_full: bool, is_utc: bool, show_circuit: bool, rounds_ahead: int = 0):
+    def calendar(self, show_full: bool, show_circuit: bool, free_practice: bool, rounds_ahead: int = 0):
         _, rows = fetchers.calendar(self.year)
         
         today = Today()
         is_current_found = False
-        as_local = not is_utc
         time_fmt = "%H:%M"
         separator_width = 36
+        as_local = self.as_local 
 
-        if is_utc:
+        if not self.as_local:
             time_fmt += " %Z"
             separator_width += 4
 
         for rnd, gp, circuit, \
+                fp1, fp1_time, fp2, fp2_time, \
+                fp3, fp3_time, fp4, fp4_time, \
                 race_date, race_time, \
                 sprint_date, sprint_time, \
                 quali_date, quali_time, \
@@ -737,6 +740,18 @@ class Calendar:
                 print(f"Circuit: {circuit}".center(separator_width + 2))
             
             print("  " + separator(separator_width))
+
+            if free_practice:
+                practice = [(fp1, fp1_time), (fp2, fp2_time), (fp3, fp3_time), (fp4, fp4_time)]
+                i = 1
+
+                for fp_date, fp_time in practice:
+                    if not fp_date or not fp_time:
+                        continue
+
+                    fp = Date(fp_date, fp_time)
+                    print(f"  - Free Practice {i}:   {fp.date(as_local)} at {fp.time(as_local, time_fmt)}")
+                    i += 1
 
             if sprint_date:
                 sprint = Date(sprint_date, sprint_time)
