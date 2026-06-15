@@ -210,7 +210,7 @@ class Sprint:
             if reason_retired:
                 dnf_comments.append(f"{driver} - Reason retired: {reason_retired}")
 
-            if pos_gained: row[3] += f" ({strsign(pos_gained)})"
+            if pos_gained: row[0] += f" ({strsign(pos_gained)})"
 
             if penalty:
                 row[0] += '*'

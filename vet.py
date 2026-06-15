@@ -142,7 +142,7 @@ def main():
     race_p.add_argument      ("-q", "--qualifying",      action="store_true", help="Show the qualifying result instead")
 
     results_p = subps.add_parser("results", help="Show results for all races/quali for given year")
-    results_p.add_argument      ("year",metavar="YEAR", type=int,            help="Season year. Current year if omitted")
+    results_p.add_argument      ("year",metavar="YEAR", type=int, nargs="?", default=CURRENT_YEAR, help="Season year. Current year if omitted")
     results_p.add_argument      ("-f",  "--full",       action="store_true", help="Show full information table")
     results_p.add_argument      ("-q",  "--qualifying", action="store_true", help="Show qualifying results instead")
 

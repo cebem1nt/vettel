@@ -51,38 +51,6 @@ vet season 2023 --flags >> README.md
 
 <table><tr>
 <td>
-
-```
-vet standings --flags
-```
-```
-       Name                Nationality   Constructor    Points  
-                                                                
-  1    Kimi Antonelli      🇮🇹 ITA        Mercedes       131     
-  2    George Russell      🇬🇧 GBR        Mercedes       88      
-  3    Charles Leclerc     🇲🇨 MON        Ferrari        75      
-  4    Lewis Hamilton      🇬🇧 GBR        Ferrari        72      
-  5    Lando Norris        🇬🇧 GBR        McLaren        58      
-  6    Oscar Piastri       🇦🇺 AUS        McLaren        48      
-  7    Max Verstappen      🇳🇱 NED        Red Bull       43      
-  8    Pierre Gasly        🇫🇷 FRA        Alpine         20      
-  9    Oliver Bearman      🇬🇧 GBR        Haas           18      
-  10   Liam Lawson         🇳🇿 NZL        Racing Bulls   16      
-  11   Franco Colapinto    🇦🇷 ARG        Alpine         15      
-  12   Isack Hadjar        🇫🇷 FRA        Red Bull       14      
-  13   Carlos Sainz Jr.    🇪🇸 ESP        Williams       6       
-  14   Arvid Lindblad      🇬🇧 GBR        Racing Bulls   5       
-  15   Gabriel Bortoleto   🇧🇷 BRA        Audi           2       
-  16   Esteban Ocon        🇫🇷 FRA        Haas           1       
-  17   Alexander Albon     🇹🇭 THA        Williams       1       
-  18   Nico Hülkenberg     🇩🇪 GER        Audi           0       
-  19   Valtteri Bottas     🇫🇮 FIN        Cadillac       0       
-  20   Sergio Pérez        🇲🇽 MEX        Cadillac       0       
-  21   Lance Stroll        🇨🇦 CAN        Aston Martin   0       
-  22   Fernando Alonso     🇪🇸 ESP        Aston Martin   0       
-```
-</td>
-<td>
   
 ```sh
 vet circuit silverstone --most-wins -r=30
@@ -172,33 +140,33 @@ vet calendar 2026
 vet race japan 2026
 ```
 ```
-  Driver              Finish    Points
+Finish    Driver              Points
 
-  Kimi Antonelli      1         25
-  Oscar Piastri       2 (+1)    18
-  Charles Leclerc     3 (+1)    15
-  George Russell      4 (-2)    12
-  Lando Norris        5         10
-  Lewis Hamilton      6         8
-  Pierre Gasly        7         6
-  Max Verstappen      8 (+3)    4
-  Liam Lawson         9 (+5)    2
-  Esteban Ocon        10 (+2)   1
-  Nico Hülkenberg     11 (+2)
-  Isack Hadjar        12 (-4)
-  Gabriel Bortoleto   13 (-4)
-  Arvid Lindblad      14 (-4)
-  Carlos Sainz Jr.    15 (+1)
-  Franco Colapinto    16 (-1)
-  Sergio Pérez        17 (+2)
-  Fernando Alonso     18 (+3)
-  Valtteri Bottas     19 (+1)
-  Alexander Albon     20 (-3)
-  Lance Stroll        DNF
-  Oliver Bearman      DNF
+  1         Kimi Antonelli      25
+  2 (+1)    Oscar Piastri       18
+  3 (+1)    Charles Leclerc     15
+  4 (-2)    George Russell      12
+  5         Lando Norris        10
+  6         Lewis Hamilton      8
+  7         Pierre Gasly        6
+  8 (+3)    Max Verstappen      4
+  9 (+5)    Liam Lawson         2
+  10 (+2)   Esteban Ocon        1
+  11 (+2)   Nico Hülkenberg
+  12 (-4)   Isack Hadjar
+  13 (-4)   Gabriel Bortoleto
+  14 (-4)   Arvid Lindblad
+  15 (+1)   Carlos Sainz Jr.
+  16 (-1)   Franco Colapinto
+  17 (+2)   Sergio Pérez
+  18 (+3)   Fernando Alonso
+  19 (+1)   Valtteri Bottas
+  20 (-3)   Alexander Albon
+  DNF       Lance Stroll
+  DNF       Oliver Bearman
 
 Fastest lap: Kimi Antonelli - 1:32.432 (lap 49)
-Pole position: Kimi Antonelli
+
 
 --------------------------------------------------
 Lance Stroll - Reason retired: Mechanical
@@ -209,36 +177,68 @@ Oliver Bearman - Reason retired: Accident
 <td>
 
 ```sh
+vet standings --flags
+```
+```
+       Name                Nationality   Constructor    Points
+
+  1    Kimi Antonelli      🇮🇹 ITA        Mercedes       156
+  2    Lewis Hamilton      🇬🇧 GBR        Ferrari        115
+  3    George Russell      🇬🇧 GBR        Mercedes       106
+  4    Charles Leclerc     🇲🇨 MON        Ferrari        75
+  5    Lando Norris        🇬🇧 GBR        McLaren        73
+  6    Oscar Piastri       🇦🇺 AUS        McLaren        68
+  7    Max Verstappen      🇳🇱 NED        Red Bull       55
+  8    Pierre Gasly        🇫🇷 FRA        Alpine         41
+  9    Isack Hadjar        🇫🇷 FRA        Red Bull       34
+  10   Liam Lawson         🇳🇿 NZL        Racing Bulls   28
+  11   Oliver Bearman      🇬🇧 GBR        Haas           18
+  12   Franco Colapinto    🇦🇷 ARG        Alpine         16
+  13   Arvid Lindblad      🇬🇧 GBR        Racing Bulls   13
+  14   Carlos Sainz Jr.    🇪🇸 ESP        Williams       6
+  15   Alexander Albon     🇹🇭 THA        Williams       5
+  16   Esteban Ocon        🇫🇷 FRA        Haas           3
+  17   Gabriel Bortoleto   🇧🇷 BRA        Audi           2
+  18   Fernando Alonso     🇪🇸 ESP        Aston Martin   1
+  19   Nico Hülkenberg     🇩🇪 GER        Audi           0
+  20   Valtteri Bottas     🇫🇮 FIN        Cadillac       0
+  21   Sergio Pérez        🇲🇽 MEX        Cadillac       0
+  22   Lance Stroll        🇨🇦 CAN        Aston Martin   0    
+```
+
+</td>
+<td>
+
+```sh
 vet sprint china 2026 --full
 ```
-
 ```
-| driver            | constructor  | start | finish  | gap     | laps | penalty | pts |
-|-------------------|--------------|-------|---------|---------|------|---------|-----|
-| George Russell    | Mercedes     | 1     | 1       |         | 19   |         | 8   |
-| Charles Leclerc   | Ferrari      | 6     | 2 (+4)  | +0.674  | 19   |         | 7   |
-| Lewis Hamilton    | Ferrari      | 4     | 3 (+1)  | +2.554  | 19   |         | 6   |
-| Lando Norris      | McLaren      | 3     | 4 (-1)  | +4.433  | 19   |         | 5   |
-| Kimi Antonelli    | Mercedes     | 2     | 5 (-3)  | +5.688  | 19   |         | 4   |
-| Oscar Piastri     | McLaren      | 5     | 6 (-1)  | +6.809  | 19   |         | 3   |
-| Liam Lawson       | Racing Bulls | 13    | 7 (+6)  | +10.900 | 19   |         | 2   |
-| Oliver Bearman    | Haas         | 9     | 8 (+1)  | +11.271 | 19   |         | 1   |
-| Max Verstappen    | Red Bull     | 8     | 9 (-1)  | +11.619 | 19   |         |     |
-| Esteban Ocon      | Haas         | 12    | 10 (+2) | +13.887 | 19   |         |     |
-| Pierre Gasly      | Alpine       | 7     | 11 (-4) | +14.780 | 19   |         |     |
-| Carlos Sainz Jr.  | Williams     | 17    | 12 (+5) | +15.753 | 19   |         |     |
-| Gabriel Bortoleto | Audi         | 14    | 13 (+1) | +15.858 | 19   |         |     |
-| Franco Colapinto  | Alpine       | 16    | 14 (+2) | +16.393 | 19   |         |     |
-| Isack Hadjar      | Red Bull     | 10    | 15 (-5) | +16.430 | 19   |         |     |
-| Alexander Albon   | Williams     | 22    | 16 (+6) | +20.014 | 19   |         |     |
-| Fernando Alonso   | Aston Martin | 18    | 17 (+1) | +21.599 | 19   |         |     |
-| Lance Stroll      | Aston Martin | 19    | 18 (+1) | +21.971 | 19   |         |     |
-| Sergio Pérez      | Cadillac     | 21    | 19 (+2) | +28.241 | 19   | 5.000   |     |
-| Nico Hülkenberg   | Audi         | 11    | DNF     |         | 12   |         |     |
-| Valtteri Bottas   | Cadillac     | 20    | DNF     |         | 12   |         |     |
-| Arvid Lindblad    | Racing Bulls | 15    | DNF     |         | 11   |         |     |
+| Finish   | Driver            | Contructor   | Start | Gap     | Laps | Pts |
+|----------|-------------------|--------------|-------|---------|------|-----|
+| 1        | George Russell    | Mercedes     | 1     |         | 19   | 8   |
+| 2 (+4)   | Charles Leclerc   | Ferrari      | 6     | +0.674  | 19   | 7   |
+| 3 (+1)   | Lewis Hamilton    | Ferrari      | 4     | +2.554  | 19   | 6   |
+| 4 (-1)   | Lando Norris      | McLaren      | 3     | +4.433  | 19   | 5   |
+| 5 (-3)   | Kimi Antonelli    | Mercedes     | 2     | +5.688  | 19   | 4   |
+| 6 (-1)   | Oscar Piastri     | McLaren      | 5     | +6.809  | 19   | 3   |
+| 7 (+6)   | Liam Lawson       | Racing Bulls | 13    | +10.900 | 19   | 2   |
+| 8 (+1)   | Oliver Bearman    | Haas         | 9     | +11.271 | 19   | 1   |
+| 9 (-1)   | Max Verstappen    | Red Bull     | 8     | +11.619 | 19   |     |
+| 10 (+2)  | Esteban Ocon      | Haas         | 12    | +13.887 | 19   |     |
+| 11 (-4)  | Pierre Gasly      | Alpine       | 7     | +14.780 | 19   |     |
+| 12 (+5)  | Carlos Sainz Jr.  | Williams     | 17    | +15.753 | 19   |     |
+| 13 (+1)  | Gabriel Bortoleto | Audi         | 14    | +15.858 | 19   |     |
+| 14 (+2)  | Franco Colapinto  | Alpine       | 16    | +16.393 | 19   |     |
+| 15 (-5)  | Isack Hadjar      | Red Bull     | 10    | +16.430 | 19   |     |
+| 16 (+6)  | Alexander Albon   | Williams     | 22    | +20.014 | 19   |     |
+| 17 (+1)  | Fernando Alonso   | Aston Martin | 18    | +21.599 | 19   |     |
+| 18 (+1)  | Lance Stroll      | Aston Martin | 19    | +21.971 | 19   |     |
+| 19 (+2)* | Sergio Pérez      | Cadillac     | 21    | +28.241 | 19   |     |
+| DNF      | Nico Hülkenberg   | Audi         | 11    |         | 12   |     |
+| DNF      | Valtteri Bottas   | Cadillac     | 20    |         | 12   |     |
+| DNF      | Arvid Lindblad    | Racing Bulls | 15    |         | 11   |     |
 
-Pole position: George Russell
+* - Sergio Pérez got 5.000s penalty
 
 --------------------------------------------------
 Nico Hülkenberg - Reason retired: Mechanical
@@ -253,6 +253,10 @@ Other:
 ```sh
 # Get 2023 max verstappen comprehensive overview/statistics:
 vet driver max-verstappen 2023
+```
+```sh
+# Show driver standings for current year
+vet standings
 ```
 ```sh
 # Get 2023 max verstappen race results table:
@@ -275,8 +279,8 @@ vet season 2026 --constructor
 vet sprint miami 2026 -q
 ```
 ```sh
-# Show 2026 gp calendar
-vet calendar 2026
+# Show full 2026 gp calendar with free practice and circuit name
+vet calendar -f -fp -c
 ```
 ```sh
 # Search database for driver with "max"
@@ -294,25 +298,24 @@ vet db --sql my_hacky.sql
 yay -S vettel # Or with any other aur helper like paru
 ```
 
-<details>
-  <summary><h3>From source:</h3></summary>
+### From source:
 
-  ```sh
-  git clone https://github.com/cebem1nt/vettel.git
-  cd vettel
-  ```
+```sh
+git clone https://github.com/cebem1nt/vettel.git
+cd vettel
+```
 
-  #### Using pip
-  ```sh
-  pip install .
-  ```
+#### Using pip
 
-  #### Using old setup.py
-  ```sh
-  sudo python setup.py install --optimize=1
-  ```
+```sh
+pip install .
+```
 
-</details>
+#### Using old setup.py
+
+```sh
+sudo python setup.py install
+```
 
 To get new info, update database once in a while with:
 
@@ -323,21 +326,24 @@ vet db --update
 ## Misc
 
 ```
-usage: vet [-h] [--double-headers] [--no-delimiters] [--adjustment {left,center,right}] [--version] {circuit,driver,race,sprint,standings,season,calendar,db} ...
+usage: vet [-h] [--double-headers] [--no-delimiters] [--adjustment {left,center,right}] [--version]
+           {circuit,driver,race,results,sprint,standings,season,calendar,db,search} ...
 
 Different info, statistics, records, all time bests of Formula One
 
 positional arguments:
-  {circuit,driver,race,sprint,standings,season,calendar,db}
+  {circuit,driver,race,results,sprint,standings,season,calendar,db,search}
                         Available commands
     circuit             Get different records for a circuit
     driver              Different driver's statistics, data over the season or all time
-    race                Show exact/all races results for given year
+    race                Show exact race result for given year
+    results             Show results for all races/quali for given year
     sprint              Sprint results
     standings           Season driver standings
     season              Fancy wikipedia like season table for driver/constructor championship
     calendar            Dates/calendar for a given season
     db                  Different database related commands
+    search              Search the database
 
 options:
   -h, --help            show this help message and exit
