@@ -1,8 +1,8 @@
 SELECT
     ROW_NUMBER() 
         OVER (ORDER BY total DESC) AS '',
-    driver,
-    total
+    driver as "Driver",
+    total as "Total"
 FROM (
     SELECT
         driver.name AS driver,

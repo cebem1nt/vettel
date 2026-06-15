@@ -1,14 +1,11 @@
 SELECT
     ROW_NUMBER() OVER 
-        (ORDER BY best ASC) AS '',
+        (ORDER BY "Time" ASC) AS '',
     t.*
 FROM (
     SELECT 
-        race.year,
-        driver.name as driver,
-        q.qualifying_q1 as q1,
-        q.qualifying_q2 as q2,
-        q.qualifying_q3 as q3,
+        race.year as "Year",
+        driver.name as "Driver",
         CASE 
             WHEN q.qualifying_time THEN q.qualifying_time
             WHEN q.qualifying_q1
@@ -21,11 +18,7 @@ FROM (
                 and (q.qualifying_q1 is NULL or q.qualifying_q3 <= q.qualifying_q1)
                 and (q.qualifying_q2 is NULL or q.qualifying_q3 <= q.qualifying_q2) THEN q.qualifying_q3
             ELSE NULL
-        END as best,
-        q.qualifying_laps as laps,
-        q.tyre_manufacturer_id as tyre,
-        q.engine_manufacturer_id as engine,
-        q.constructor_id as constructor
+        END as "Time"
     FROM     
         race_data q
     JOIN
@@ -37,4 +30,4 @@ FROM (
         race.circuit_id = ?
 ) t
 WHERE 
-    t.best is not NULL
+    t."Time" is not NULL

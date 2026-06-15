@@ -53,42 +53,42 @@ vet season 2023 --flags >> README.md
 <td>
   
 ```sh
-vet circuit silverstone --most-wins -r=30
+vet --no-delimiters circuit silverstone -mw -r=30
 ```
   
 ```
-|    | driver                | total |
-|----|-----------------------|-------|
-| 1  | Lewis Hamilton        | 9     |
-| 2  | Alain Prost           | 5     |
-| 3  | Jim Clark             | 3     |
-| 4  | Michael Schumacher    | 3     |
-| 5  | Nigel Mansell         | 3     |
-| 6  | Alberto Ascari        | 2     |
-| 7  | David Coulthard       | 2     |
-| 8  | Fernando Alonso       | 2     |
-| 9  | Jackie Stewart        | 2     |
-| 10 | Jacques Villeneuve    | 2     |
-| 11 | José Froilán González | 2     |
-| 12 | Mark Webber           | 2     |
-| 13 | Max Verstappen        | 2     |
-| 14 | Sebastian Vettel      | 2     |
-| 15 | Ayrton Senna          | 1     |
-| 16 | Carlos Sainz Jr.      | 1     |
-| 17 | Clay Regazzoni        | 1     |
-| 18 | Damon Hill            | 1     |
-| 19 | Emerson Fittipaldi    | 1     |
-| 20 | Jack Brabham          | 1     |
-| 21 | James Hunt            | 1     |
-| 22 | John Watson           | 1     |
-| 23 | Johnny Herbert        | 1     |
-| 24 | Juan Manuel Fangio    | 1     |
-| 25 | Juan Pablo Montoya    | 1     |
-| 26 | Kimi Räikkönen        | 1     |
-| 27 | Lando Norris          | 1     |
-| 28 | Mika Häkkinen         | 1     |
-| 29 | Nico Rosberg          | 1     |
-| 30 | Nino Farina           | 1     |
+      Driver                  Total
+
+  1    Lewis Hamilton          9
+  2    Alain Prost             5
+  3    Jim Clark               3
+  4    Michael Schumacher      3
+  5    Nigel Mansell           3
+  6    Alberto Ascari          2
+  7    David Coulthard         2
+  8    Fernando Alonso         2
+  9    Jackie Stewart          2
+  10   Jacques Villeneuve      2
+  11   José Froilán González   2
+  12   Mark Webber             2
+  13   Max Verstappen          2
+  14   Sebastian Vettel        2
+  15   Ayrton Senna            1
+  16   Carlos Sainz Jr.        1
+  17   Clay Regazzoni          1
+  18   Damon Hill              1
+  19   Emerson Fittipaldi      1
+  20   Jack Brabham            1
+  21   James Hunt              1
+  22   John Watson             1
+  23   Johnny Herbert          1
+  24   Juan Manuel Fangio      1
+  25   Juan Pablo Montoya      1
+  26   Kimi Räikkönen          1
+  27   Lando Norris            1
+  28   Mika Häkkinen           1
+  29   Nico Rosberg            1
+  30   Nino Farina             1
 ```
 
 </td>
