@@ -68,36 +68,36 @@ vet --no-delimiters circuit silverstone -mw -r=30
 vet calendar 2026
 ```
 ```
-        Round 1 - Australia
- -----------------------------------
- - Qualifying:        Mar 07 at 05:00
- - Race:              Mar 08 at 04:00
+            R1 - Australia
+  ------------------------------------
+  - Qualifying:        Mar 07 at 02:00
+  - Race:              Mar 08 at 01:00
 
-          Round 2 - China
- -----------------------------------
- - Sprint qualifying: Mar 13 at 07:30
- - Sprint:            Mar 14 at 03:00
- - Qualifying:        Mar 14 at 07:00
- - Race:              Mar 15 at 07:00
+              R2 - China
+  ------------------------------------
+  - Sprint qualifying: Mar 13 at 04:30
+  - Sprint:            Mar 14 at 00:00
+  - Qualifying:        Mar 14 at 04:00
+  - Race:              Mar 15 at 04:00
 
-         Round 3 - Japan
- -----------------------------------
- - Qualifying:        Mar 28 at 06:00
- - Race:              Mar 29 at 05:00
+              R3 - Japan
+  ------------------------------------
+  - Qualifying:        Mar 28 at 03:00
+  - Race:              Mar 29 at 02:00
 
-          Round 4 - Miami
- -----------------------------------
- - Sprint qualifying: May 01 at 20:30
- - Sprint:            May 02 at 16:00
- - Qualifying:        May 02 at 20:00
- - Race:              May 03 at 17:00
+              R4 - Miami
+  ------------------------------------
+  - Sprint qualifying: May 01 at 17:30
+  - Sprint:            May 02 at 13:00
+  - Qualifying:        May 02 at 17:00
+  - Race:              May 03 at 14:00
 
-      -*- Round 5 - Canada -*-
- -----------------------------------
- - Sprint qualifying: May 22 at 20:30
- - Sprint:            May 23 at 16:00
- - Qualifying:        May 23 at 20:00
- - Race:              May 24 at 20:00
+          -*- R5 - Canada -*-
+  ------------------------------------
+  - Sprint qualifying: May 22 at 17:30
+  - Sprint:            May 23 at 13:00
+  - Qualifying:        May 23 at 17:00
+  - Race:              May 24 at 17:00
 
                 ....
 ```
