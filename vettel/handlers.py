@@ -20,7 +20,7 @@ from vettel.emoji import gp_flags, get_ioc_flag
 
 Opt = Optional
 
-class DB:
+class Database:
     def __init__(self, out_table: Table):
         self.table = out_table
 
@@ -34,7 +34,8 @@ class DB:
 
         except FileNotFoundError:
             return print(f'File "{file}" does not exist')
-    
+
+class Search:
     def search(
         self, 
         part: str, 

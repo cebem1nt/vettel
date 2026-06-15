@@ -4,7 +4,8 @@ import os, argparse, sys
 from vettel.tables import Table
 from vettel.helpers import Today
 from vettel.handlers import (
-    DB,
+    Database,
+    Search,
     Race,
     Sprint,
     Driver, 
@@ -81,7 +82,7 @@ def match_args(args: argparse.Namespace):
                 sprint.sprint()
 
         case "db":
-            db = DB(table)
+            db = Database(table)
 
             if args.sql:
                 db.execute_sql(args.sql)
@@ -89,23 +90,17 @@ def match_args(args: argparse.Namespace):
             if args.update:
                 db.update()
 
-            if args.search:
-                queries = []
+        case "search":
+            search = Search()
+            queries = []
 
-                if args.driver:
-                    queries.append((args.driver, "driver"))
-
-                if args.constructor:
-                    queries.append((args.constructor, "constructor"))
-
-                if args.circuit:
-                    queries.append((args.circuit, "circuit"))
-
-                if args.grand_prix:
-                    queries.append((args.grand_prix, "grand_prix"))
-            
-                for query, table in queries:
-                    db.search(query, table, args.column, args.as_pattern)
+            if args.driver:         queries.append((args.driver, "driver"))
+            if args.constructor:    queries.append((args.constructor, "constructor"))
+            if args.circuit:        queries.append((args.circuit, "circuit"))
+            if args.grand_prix:     queries.append((args.grand_prix, "grand_prix"))
+        
+            for query, table in queries:
+                search.search(query, table, args.column, args.as_pattern)
             
         case _:
             print(f"Unknown command: {args.command}")
@@ -175,17 +170,17 @@ def main():
     calendar_p.add_argument      ("-r",  "--rounds-ahead",  type=int, default=0, help="How much more rounds to show after the current one")
     calendar_p.add_argument      ("--utc",                  action="store_true", help="Show time in utc timezone instead")
 
-    # TODO perhaps split search into a sub-parser?
     db_p = subps.add_parser("db", help="Different database related commands")
     db_p.add_argument      ("-s", "--sql",              type=str,             help="Run arbitrary sql script on the f1db")
     db_p.add_argument      ("-u", "--update", "--init", action="store_true",  help="Update/init f1db")
-    db_p.add_argument      ("-S", "--search",           action="store_true",  help="Enable search mode. Provide additional -d/t/c/g with part to search for")
-    db_p.add_argument      ("-d", "--driver",      metavar="PART", type=str,  help="If searching, search for driver")
-    db_p.add_argument      ("-t", "--constructor", metavar="PART", type=str,  help="If searching, search for a constructor (team)")
-    db_p.add_argument      ("-c", "--circuit",     metavar="PART", type=str,  help="If searching, search for circuit")
-    db_p.add_argument      ("-g", "--grand-prix",  metavar="PART", type=str,  help="If searching, search for grand prix")
-    db_p.add_argument      ("--as-pattern",              action="store_true", help="If searching, treat part as entire pattern for sql LIKE")
-    db_p.add_argument      ("--column",  type=str,       default="name",      help="If searching, use given colum to match part, defaults to \"name\"")
+
+    search_p = subps.add_parser("search", help="Search the database")
+    search_p.add_argument      ("-d", "--driver",      metavar="PART", type=str,  help="search driver with given part in the name")
+    search_p.add_argument      ("-t", "--constructor", metavar="PART", type=str,  help="search for a constructor (team)")
+    search_p.add_argument      ("-c", "--circuit",     metavar="PART", type=str,  help="search circuit")
+    search_p.add_argument      ("-gp", "--grand-prix",  metavar="PART", type=str,  help="search grand prix")
+    search_p.add_argument      ("--as-pattern",              action="store_true", help="treat part as entire pattern for sql LIKE")
+    search_p.add_argument      ("--column",  type=str,       default="name",      help="use given colum to match part, defaults to \"name\"")
 
     args = p.parse_args()
 
