@@ -111,7 +111,7 @@ def print_table(
     show_nones=False
 ):
     if len(rows) and len(headers) != len(rows[0]):
-        raise ValueError("Amount of rows doesn't match amount of headers.")
+        raise ValueError("Amount of columns doesn't match amount of headers.")
 
     widths = [len(to_str(h, show_nones)) for h in headers]
 

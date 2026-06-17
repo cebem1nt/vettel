@@ -29,11 +29,14 @@ class Database:
 
     def execute_sql(self, file: str):
         try:
-            self.table.rows, self.table.headers = DB.run_file(file)
+            self.table.headers, self.table.rows = DB.run_file(file)
             self.table.flush()
 
         except FileNotFoundError:
             return print(f'File "{file}" does not exist')
+
+        except Exception as e:
+            print(str(e))
 
 class Search:
     def search(
