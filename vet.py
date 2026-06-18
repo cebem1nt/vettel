@@ -108,10 +108,10 @@ def match_args(args: argparse.Namespace):
 def main():
     p = argparse.ArgumentParser(description="Different info, statistics, records, all time bests of Formula One")
 
+    p.add_argument("-v", "--version",  action="store_true",                                 help="Show vettel version and exit")
     p.add_argument("--double-headers", action="store_true",                                 help="Print table headers twice (at the top and bottom)")
     p.add_argument("--no-delimiters",  action="store_true",                                 help="Do not print any separators for tables")
     p.add_argument("--adjustment",     default="left", choices=("left", "center", "right"), help="Table text alignment")
-    p.add_argument("--version",        action="store_true",                                 help="Show vettel version and exit")
 
     subps = p.add_subparsers(dest="command", help="Available commands")
 
