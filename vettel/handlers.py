@@ -47,24 +47,14 @@ class Search:
         overwrite_pattern=False
     ):
         pattern = part if overwrite_pattern else f"%{part}%"
-
-        fetched = DB.execute(
-            f"SELECT * FROM {table} WHERE {table}.{column} LIKE ?"
-        , [pattern])
-
-        headers = []
-        name_index = 0
-
-        for i, c in enumerate(DB.cur.description):
-            headers.append(c[0])
-            if c[0] == "name": 
-                name_index = i
+        fetched = fetchers.raw_sql(
+            f"SELECT * FROM {table} WHERE {table}.{column} LIKE ?", [pattern], as_dict=True)
 
         for found in fetched:
-            print(f"\n---- Found: {found[name_index]} ----\n")
+            print(f"\n---- Found: {found["name"]} ----\n")
 
-            for i in range(len(headers)):
-                print(f"{headers[i]}: {found[i]}")
+            for key, value in found.items():
+                print(f"{key}: {value}")                
 
 class Race:
     def __init__(

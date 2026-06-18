@@ -7,23 +7,32 @@ from vettel.database import DB
 def __dict_row_factory(cursor: Cursor, row: Row):
     return {col[0]: row[idx] for idx, col in enumerate(cursor.description)}
 
-def __run_script(script: str, params: Opt[Iterable], as_dict: bool):
+def __new_dict_cursor():
+    cursor = DB.con.cursor()
+    cursor.row_factory = __dict_row_factory
+    return cursor
+
+def __run_script(
+    script: str, 
+    params: Iterable = [], 
+    as_dict: bool = False
+):
     if not as_dict:
         return DB.run_script(script, params)
 
-    cur = DB.con.cursor()
-    cur.row_factory = __dict_row_factory
-    return DB.run_script(script, params, overwrite_cursor=cur)
+    return DB.run_script(script, params, cursor=__new_dict_cursor())
 
-def __raw_sql(sql: str, params: Opt[Iterable] = None):
-    rows = DB.execute(sql, params)
-    headers = [c[0] for c in DB.cur.description]
-    return headers, rows
+def raw_sql(
+    sql: str, 
+    params: Iterable = [], 
+    as_dict: bool = False
+):
+    if not as_dict:
+        return DB.get_columns(), DB.execute(sql, params)
+    
+    return DB.execute(sql, params, cursor=__new_dict_cursor())
 
-def raw_sql(sql: str, params: Opt[Iterable]):
-    return __raw_sql(sql, params)
-
-def raw_script(script: str, params: Opt[Iterable] = None):
+def raw_script(script: str, params: Iterable = []):
     return DB.run_script(script, params)
 
 def race(id: str, year: int, as_dict: bool = False):
@@ -78,7 +87,7 @@ def season_gps(year: int, as_dict: bool = False):
 def calendar(year: int, as_dict: bool = False):
     return __run_script("calendar", [year], as_dict)
 
-def gps(year: int):
+def gps(year: int, as_dict: bool = False):
     sql = """
         SELECT 
             grand_prix.id, 
@@ -88,9 +97,9 @@ def gps(year: int):
         WHERE race.grand_prix_id = grand_prix.id
     """
 
-    return __raw_sql(sql, [year])
+    return raw_sql(sql, [year], as_dict)
 
-def circuit_info(id: str): 
+def circuit_info(id: str, as_dict: bool = False): 
     sql = """
         SELECT 
             circuit.*, 
@@ -100,7 +109,7 @@ def circuit_info(id: str):
         WHERE circuit.id = :id
     """
 
-    return __raw_sql(sql, {"id": id})
+    return raw_sql(sql, {"id": id}, as_dict)
 
 def standings(year: int, is_constructor: bool, as_dict: bool = False):
     script = "standings/constructor" if is_constructor else \

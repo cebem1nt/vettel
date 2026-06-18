@@ -1,14 +1,14 @@
 import os, sys
 
-from sqlite3 import connect as sql_connect, Row, Cursor
-from typing import Iterable, Optional as Opt, List
+from sqlite3 import Cursor, connect as sql_connect
+from typing import Iterable, Optional as Opt
 
 from urllib.request import urlopen
 from zipfile import ZipFile
 
 DB_SOURCE = "https://github.com/f1db/f1db/releases/latest/download/f1db-sqlite.zip"
 DB_ZIP_NAME = "f1db-sqlite.zip"
-DB_NAME = "f1db.db"
+DB_FILE_NAME = "f1db.db"
 
 class F1DB:
     if xdg := os.getenv("XDG_DATA_HOME"):
@@ -16,14 +16,13 @@ class F1DB:
     else:
         db_dir = os.path.expanduser("~/.local/share/vettel")
 
-    db_file = os.path.join(db_dir, DB_NAME)
+    db_file = os.path.join(db_dir, DB_FILE_NAME)
 
     def __init__(self):
         self.root_dir = os.path.dirname(os.path.realpath(__file__))
-        self.sql_scripts_dir = os.path.join(self.root_dir, "sql")
+        self.scripts_dir = os.path.join(self.root_dir, "sql")
         
         if not os.path.exists(self.db_file):
-            print("No database found, installing...")
             self.update()
             exit(0)
 
@@ -32,15 +31,15 @@ class F1DB:
 
     def run_script(
         self, 
-        name: str, 
+        script: str, 
         params: Iterable = [],
         extra_sql: Opt[str] = None,
-        overwrite_cursor: Opt[Cursor] = None
-    ) -> tuple[Headers, List[Row]]:
-        script = os.path.join(self.sql_scripts_dir, name + ".sql")
+        cursor: Opt[Cursor] = None
+    ):
+        script = os.path.join(self.scripts_dir, script + ".sql")
 
-        cur = overwrite_cursor if overwrite_cursor else \
-              self.cur
+        if not cursor:
+            cursor = self.cur
 
         with open(script) as s:
             sql = s.read()
@@ -48,17 +47,24 @@ class F1DB:
         if extra_sql:
             sql += extra_sql
 
-        cur.execute(sql, params)
-        return [c[0] for c in cur.description], cur.fetchall()
+        cursor.execute(sql, params)
+        return self.get_columns(cursor), cursor.fetchall()
 
-    def run_file(self, file: str) -> tuple[Headers, List[Row]]:
+    def run_file(self, file: str):
         with open(file) as f:
             self.cur.execute(f.read())
 
         return (
-            [c[0] for c in self.cur.description],
+            self.get_columns(),
             self.cur.fetchall()
         )
+
+    def execute(self, sql: str, params: Iterable = [], cursor: Opt[Cursor] = None):
+        if not cursor:
+            cursor = self.cur
+
+        cursor.execute(sql, params)
+        return cursor.fetchall()
 
     def update(self):
         os.makedirs(self.db_dir, exist_ok=True)
@@ -87,8 +93,9 @@ class F1DB:
         os.remove(DB_ZIP_NAME)
         print("Database was installed successfully!")
 
-    def execute(self, sql: str, params: Opt[Iterable]) -> List[Row]:
-        self.cur.execute(sql, params)
-        return self.cur.fetchall()
+    def get_columns(self, cursor: Opt[Cursor] = None):
+        if not cursor:
+            cursor = self.cur
+        return [c[0] for c in cursor.description]
 
 DB = F1DB()

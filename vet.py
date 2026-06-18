@@ -162,7 +162,7 @@ def main():
     season_p.add_argument      ("-c", "--constructor",  action="store_true", help="Show constructor table instead")
     season_p.add_argument      ("--flags",              action="store_true", help="Add emoji flags to grand prix columns")
 
-    calendar_p = subps.add_parser("calendar", help="Dates/calendar for a given season")
+    calendar_p = subps.add_parser("calendar", help="Calendar for a given season")
     calendar_p.add_argument      ("year",metavar="YEAR",    type=int, nargs="?", default=CURRENT_YEAR, help="Season year. Current year if omitted")
     calendar_p.add_argument      ("-f",  "--full",          action="store_true", help="Show full calendar, do not stop at current stage")
     calendar_p.add_argument      ("-fp", "--free-practice", action="store_true", help="Show free practice")
@@ -170,17 +170,17 @@ def main():
     calendar_p.add_argument      ("-r",  "--rounds-ahead",  type=int, default=0, help="How much more rounds to show after the current one")
     calendar_p.add_argument      ("--utc",                  action="store_true", help="Show time in utc timezone instead")
 
-    db_p = subps.add_parser("db", help="Different database related commands")
-    db_p.add_argument      ("-s", "--sql",              type=str,             help="Run arbitrary sql script on the f1db")
-    db_p.add_argument      ("-u", "--update", "--init", action="store_true",  help="Update/init f1db")
-
     search_p = subps.add_parser("search", help="Search the database")
     search_p.add_argument      ("-d", "--driver",      metavar="PART", type=str,  help="search driver with given part in the name")
     search_p.add_argument      ("-t", "--constructor", metavar="PART", type=str,  help="search for a constructor (team)")
     search_p.add_argument      ("-c", "--circuit",     metavar="PART", type=str,  help="search circuit")
-    search_p.add_argument      ("-gp", "--grand-prix",  metavar="PART", type=str,  help="search grand prix")
+    search_p.add_argument      ("-gp", "--grand-prix", metavar="PART", type=str,  help="search grand prix")
     search_p.add_argument      ("--as-pattern",              action="store_true", help="treat part as entire pattern for sql LIKE")
     search_p.add_argument      ("--column",  type=str,       default="name",      help="use given colum to match part, defaults to \"name\"")
+
+    db_p = subps.add_parser("db", help="Different database related commands")
+    db_p.add_argument      ("-s", "--sql",              type=str,             help="Run arbitrary sql script on the f1db")
+    db_p.add_argument      ("-u", "--update",           action="store_true",  help="Update/init f1db")
 
     args = p.parse_args()
 
