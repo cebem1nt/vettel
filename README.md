@@ -326,13 +326,12 @@ vet db --update
 ## Misc
 
 ```
-usage: vet [-h] [--double-headers] [--no-delimiters] [--adjustment {left,center,right}] [--version]
-           {circuit,driver,race,results,sprint,standings,season,calendar,db,search} ...
+usage: vet [-h] [-v] [--double-headers] [--no-delimiters] [--adjustment {left,center,right}] {circuit,driver,race,results,sprint,standings,season,calendar,search,db} ...
 
 Different info, statistics, records, all time bests of Formula One
 
 positional arguments:
-  {circuit,driver,race,results,sprint,standings,season,calendar,db,search}
+  {circuit,driver,race,results,sprint,standings,season,calendar,search,db}
                         Available commands
     circuit             Get different records for a circuit
     driver              Different driver's statistics, data over the season or all time
@@ -341,15 +340,15 @@ positional arguments:
     sprint              Sprint results
     standings           Season driver standings
     season              Fancy wikipedia like season table for driver/constructor championship
-    calendar            Dates/calendar for a given season
-    db                  Different database related commands
+    calendar            Calendar for a given season
     search              Search the database
+    db                  Different database related commands
 
 options:
   -h, --help            show this help message and exit
+  -v, --version         Show vettel version and exit
   --double-headers      Print table headers twice (at the top and bottom)
   --no-delimiters       Do not print any separators for tables
   --adjustment {left,center,right}
                         Table text alignment
-  --version             Show vettel version and exit
 ```
