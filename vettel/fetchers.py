@@ -28,7 +28,8 @@ def raw_sql(
     as_dict: bool = False
 ):
     if not as_dict:
-        return DB.get_columns(), DB.execute(sql, params)
+        out = DB.execute(sql, params)
+        return DB.get_columns(), out
     
     return DB.execute(sql, params, cursor=__new_dict_cursor())
 
